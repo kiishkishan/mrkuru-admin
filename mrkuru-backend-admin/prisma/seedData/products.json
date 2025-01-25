@@ -1,0 +1,29 @@
+[
+  {
+    "productId": "eb34d78a-7267-4a9d-8642-b287707aeee6",
+    "productStatusId": "062cd848-4ab5-4ba1-a9c7-e503ffe02bd0",
+    "name": "Anker Soundcore A30i",
+    "price": 11500.00,
+    "rating": 4.75,
+    "stockQuantity": 0,
+    "details": "Anker Soundcore A30i is a high-end wireless earbuds with active noise cancellation."
+  },
+  {
+    "productId": "00be26fe-fe06-431a-9acd-06c8edca2a65",
+    "productStatusId": "0d9921b7-df37-4d8d-89a0-31a00259ca8b",
+    "name": "Airpods ANC Premium Copy with Display",
+    "price": 5000.00,
+    "rating": 4.56,
+    "stockQuantity": 5,
+    "details": "Airpods ANC with Display is a wireless earbuds with active noise cancellation."
+  },
+  {
+    "productId": "cfaa3117-2c15-4a65-b8fa-9ea3b04cbeb9",
+    "productStatusId": "0d9921b7-df37-4d8d-89a0-31a00259ca8b",
+    "name": "HK 9 Pro Max Smartwatch",
+    "price": 9000.00,
+    "rating": 4.82,
+    "stockQuantity": 10,
+    "details": "HK 9 Pro Max Smartwatch is a high-end smartwatch with a lot of features."
+  }
+]

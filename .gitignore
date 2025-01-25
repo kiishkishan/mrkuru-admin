@@ -1,0 +1,7 @@
+mrkuru-frontend-admin/node_modules/
+mrkuru-backend-admin/node_modules/
+mrkuru-frontend-admin/dist/
+mrkuru-backend-admin/dist/
+mrkuru-frontend-admin/.env/
+mrkuru-backend-admin/.env/
+mrkuru-frontend-admin/.next/

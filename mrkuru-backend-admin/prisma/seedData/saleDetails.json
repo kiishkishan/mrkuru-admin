@@ -1,0 +1,18 @@
+[
+  {
+    "salesDetailsId": "471afdc0-7bf3-4e57-acc9-c04682fd52d7",
+    "saleId": "957255d7-f9e8-4144-957c-306c10524a5b",
+    "productId": "00be26fe-fe06-431a-9acd-06c8edca2a65",
+    "quantity": 2,
+    "unitPrice": 5000.0,
+    "totalPrice": 10000.0
+  },
+  {
+    "salesDetailsId": "fa703709-0c7f-4485-b8ec-803536fb42b7",
+    "saleId": "957255d7-f9e8-4144-957c-306c10524a5b",
+    "productId": "cfaa3117-2c15-4a65-b8fa-9ea3b04cbeb9",
+    "quantity": 1,
+    "unitPrice": 9000.0,
+    "totalPrice": 9000.0
+  }
+]

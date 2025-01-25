@@ -1,0 +1,10 @@
+[
+  {
+    "saleId": "957255d7-f9e8-4144-957c-306c10524a5b",
+    "agentId": "a16abfd7-7102-4e57-8abf-4c9a35714d32",
+    "timeStamp": "2025-01-20T10:00:00Z",
+    "customerName": "Jane Smith",
+    "customerContact": "5432167890",
+    "subTotal": 19000.00
+  }
+]

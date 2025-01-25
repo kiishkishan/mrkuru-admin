@@ -1,0 +1,14 @@
+[
+    {
+        "purchaseStatusId": "a6096d3c-3851-4e51-a64c-75dc2b98036e",
+        "status": "Paid Half"
+    },
+    {
+        "purchaseStatusId": "76942930-63c7-4828-a323-74c429891941",
+        "status": "Paid Advance"
+    },
+    {
+        "purchaseStatusId": "17917ee3-23d8-4437-b00d-615fc82a0267",
+        "status": "Paid Full"
+    }
+]

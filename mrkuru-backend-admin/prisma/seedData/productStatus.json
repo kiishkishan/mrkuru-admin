@@ -1,0 +1,14 @@
+[
+  {
+    "productStatusId": "0d9921b7-df37-4d8d-89a0-31a00259ca8b",
+    "status": "In Stock"
+  },
+  {
+    "productStatusId": "062cd848-4ab5-4ba1-a9c7-e503ffe02bd0",
+    "status": "Out of Stock"
+  },
+  {
+    "productStatusId": "34aebdf5-fe10-4f15-97ea-e7be5dac6082",
+    "status": "On Hold"
+  }
+]
