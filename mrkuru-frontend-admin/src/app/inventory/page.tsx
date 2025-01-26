@@ -2,13 +2,12 @@
 
 import {
   useDeleteProductMutation,
-  useGetProductsQuery,
   useHoldSellingProductMutation,
 } from "@/state/api";
 import React, { useState } from "react";
 import Header from "@/app/(components)/Header";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
-import Rating from "../(components)/Rating";
+import Rating from "@/app/(components)/Rating";
 import {
   BadgeInfo,
   Boxes,
@@ -16,16 +15,18 @@ import {
   Inbox,
   Trash2,
 } from "lucide-react";
-import { useAppSelector } from "../redux";
+import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { createTheme, ThemeProvider } from "@mui/material";
 import Modal from "@/app/(components)/Modal";
+import { showToast } from "@/state/thunks/alertThunk";
+import useGetProducts from "@/app/(hooks)/getProducts";
 
 interface ProductID {
   productId: string;
 }
 
 const Inventory = () => {
-  const { data: products, isError, isLoading } = useGetProductsQuery();
+  const { products, isLoading, isError, refetchProducts } = useGetProducts();
   const [holdSellingProduct] = useHoldSellingProductMutation();
   const [deleteProduct] = useDeleteProductMutation();
 
@@ -39,10 +40,27 @@ const Inventory = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
-  const handleHoldSelling = async ({ productId }: ProductID) => {
-    console.log({ productId }, "handleHoldSelling");
+  const dispatch = useAppDispatch();
 
-    await holdSellingProduct({ productId });
+  const handleHoldSelling = async ({ productId }: ProductID) => {
+    try {
+      console.log({ productId }, "handleHoldSelling");
+
+      // Call the mutation to hold selling the product
+      await holdSellingProduct({ productId }).unwrap();
+
+      // Show a success toast
+      dispatch(
+        showToast("Product hold status updated successfully!", "success")
+      );
+    } catch (error) {
+      console.error("Failed to hold selling product:", error);
+
+      // Show an error toast
+      dispatch(
+        showToast("Failed to hold selling product. Please try again.", "error")
+      );
+    }
   };
 
   // Delete Confirmation Modal related functions
@@ -58,9 +76,26 @@ const Inventory = () => {
 
   const handleConfirmDelete = async () => {
     if (selectedProduct) {
-      console.log("delete selected product", selectedProduct);
-      // await deleteProduct({ productId: selectedProduct });
-      setIsModalOpen(false);
+      try {
+        await deleteProduct(selectedProduct);
+        setIsModalOpen(false);
+
+        // Debug: Log to confirm the thunk is being called
+        console.log("Product deleted successfully. Dispatching toast...");
+
+        // Show a success toast
+        dispatch(showToast("Product deleted successfully!", "success"));
+
+        // Refetch products after deleting
+        refetchProducts();
+      } catch (error) {
+        console.error("Failed to delete product:", error);
+
+        // Show an error toast
+        dispatch(
+          showToast("Failed to delete product. Please try again.", "error")
+        );
+      }
     }
   };
 
