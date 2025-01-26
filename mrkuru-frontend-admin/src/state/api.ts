@@ -100,7 +100,7 @@ export const api = createApi({
       query: (productId) => ({
         url: `/products`,
         method: "DELETE",
-        body: productId,
+        body: { productId },
       }),
       invalidatesTags: ["Product"],
     }),
