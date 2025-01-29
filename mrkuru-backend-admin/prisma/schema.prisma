@@ -32,7 +32,8 @@ model Products {
   price           Float
   rating          Float?
   stockQuantity   Int
-  details         String?
+  details         String
+  imageUrl        String
   ProductStatus   ProductStatus     @relation(fields: [productStatusId], references: [productStatusId])
   SalesDetails    SaleDetails[]
   PurchaseDetails PurchaseDetails[]
