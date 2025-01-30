@@ -80,7 +80,7 @@ const Sidebar = () => {
         }`}
       >
         <Image
-          src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/mrkuru_logo.png"
+          src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/mrkuru_logo.webp"
           alt="Logo"
           width={85}
           height={85}

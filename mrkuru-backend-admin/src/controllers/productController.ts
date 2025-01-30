@@ -17,6 +17,9 @@ export const getProducts = async (
           mode: "insensitive",
         },
       },
+      orderBy: {
+        name: "asc",
+      },
       select: {
         productId: true,
         name: true,

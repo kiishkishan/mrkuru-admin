@@ -8,35 +8,16 @@ export const getProductStatus = async (
   res: Response
 ): Promise<void> => {
   try {
-    const search = req.query.search?.toString();
-
-    const products = await prisma.products.findMany({
-      where: {
-        name: {
-          contains: search,
-          mode: "insensitive",
-        },
-      },
+    const productStatuses = await prisma.productStatus.findMany({
       select: {
-        productId: true,
-        name: true,
-        price: true,
-        rating: true,
-        stockQuantity: true,
-        details: true,
-        imageUrl: true,
-        ProductStatus: {
-          select: {
-            productStatusId: true,
-            status: true,
-          },
-        },
+        productStatusId: true,
+        status: true,
       },
     });
 
-    res.json(products);
+    res.json(productStatuses);
   } catch (error) {
-    console.error("Error retrieving products:", error);
-    res.status(500).json({ message: "Error retrieving products" });
+    console.error("Error retrieving product statuses:", error);
+    res.status(500).json({ message: "Error retrieving product statuses" });
   }
 };

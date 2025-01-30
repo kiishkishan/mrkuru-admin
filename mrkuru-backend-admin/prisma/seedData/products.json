@@ -7,7 +7,7 @@
     "rating": 4.75,
     "stockQuantity": 0,
     "details": "Anker Soundcore A30i is a high-end wireless earbuds with active noise cancellation.",
-    "imageUrl": "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/product_eb34d78a-7267-4a9d-8642-b287707aeee6.png"
+    "imageUrl": "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/product_eb34d78a-7267-4a9d-8642-b287707aeee6.webp"
   },
   {
     "productId": "00be26fe-fe06-431a-9acd-06c8edca2a65",
@@ -17,7 +17,7 @@
     "rating": 4.56,
     "stockQuantity": 5,
     "details": "Airpods ANC with Display is a wireless earbuds with active noise cancellation.",
-    "imageUrl": "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/product_00be26fe-fe06-431a-9acd-06c8edca2a65.png"
+    "imageUrl": "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/product_00be26fe-fe06-431a-9acd-06c8edca2a65.webp"
   },
   {
     "productId": "cfaa3117-2c15-4a65-b8fa-9ea3b04cbeb9",
@@ -26,7 +26,7 @@
     "price": 9000.0,
     "rating": 4.82,
     "stockQuantity": 10,
-    "details": "HK 9 Pro Max Smartwatch is a high-end smartwatch with a lot of features.",
-    "imageUrl": "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/product_cfaa3117-2c15-4a65-b8fa-9ea3b04cbeb9.png"
+    "details": "HK10 Pro Max Smartwatch is a high-end smartwatch with a lot of features.",
+    "imageUrl": "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/product_cfaa3117-2c15-4a65-b8fa-9ea3b04cbeb9.webp"
   }
 ]
