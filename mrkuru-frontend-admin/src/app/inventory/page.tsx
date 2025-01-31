@@ -298,7 +298,7 @@ const Inventory = () => {
     return <div className="py-4 animate-pulse">Loading...</div>;
   }
 
-  if (isError || !products) {
+  if (isError && !isLoading && !products) {
     return (
       <div className="py-4 text-red-500 text-center text-lg font-bold">
         Failed to fetch products

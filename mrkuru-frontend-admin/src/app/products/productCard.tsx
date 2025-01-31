@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Image from "next/image";
 import Rating from "@/app/(components)/Rating";
-import ImageSkeleton from "@/app/(components)/Skeleton/imageSkeleton";
 
 interface Product {
   productId: string;
@@ -15,7 +14,11 @@ interface Product {
   imageUrl: string;
 }
 
-const ProductCard = ({ product }: { product: Product }) => {
+interface ProductCardProps {
+  product: Product;
+}
+
+const ProductCard = ({ product }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const fallbackImage =
     "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/no_product_img_found.webp";
@@ -23,9 +26,7 @@ const ProductCard = ({ product }: { product: Product }) => {
   return (
     <div className="border border-gray-100 shadow-lg hover:shadow-xl rounded-xl p-6 max-w-full w-full mx-auto bg-gradient-to-b from-white to-gray-50 transition-all duration-300 hover:-translate-y-1.5">
       <div className="flex flex-col items-center">
-        {/* Image with loading state */}
         <div className="relative mb-4 rounded-xl w-36 h-36 bg-gray-100 overflow-hidden">
-          {!imageLoaded && <ImageSkeleton />}
           <Image
             src={product?.imageUrl || fallbackImage}
             alt={product?.name}
@@ -34,7 +35,7 @@ const ProductCard = ({ product }: { product: Product }) => {
               imageLoaded ? "opacity-100" : "opacity-0"
             } transition-opacity duration-300`}
             loading="lazy"
-            onLoadingComplete={() => setImageLoaded(true)}
+            onLoad={() => setImageLoaded(true)}
             onError={(e) => {
               (e.target as HTMLImageElement).src = fallbackImage;
             }}
