@@ -84,7 +84,8 @@ const Sidebar = () => {
           alt="Logo"
           width={85}
           height={85}
-          className="rounded-full h-full object-cover"
+          className={`rounded-xl object-cover w-auto h-auto transition-opacity duration-300`}
+          priority
         />
         <h1
           className={`${

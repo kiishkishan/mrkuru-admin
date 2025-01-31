@@ -108,7 +108,7 @@ export const api = createApi({
       invalidatesTags: ["Product"],
     }),
     // Product Status
-    getProductStatus: build.query<Product[], string | void>({
+    getProductStatus: build.query<ProductStatus[], string | void>({
       query: (search) => ({
         url: "products",
         params: search ? { search } : {},
@@ -124,4 +124,5 @@ export const {
   useCreateProductMutation,
   useHoldSellingProductMutation,
   useDeleteProductMutation,
+  useGetProductStatusQuery,
 } = api;

@@ -4,8 +4,8 @@ import React, { useState } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { Upload } from "lucide-react"; // Import Lucide icon
-import Image from "next/image"; // Import Image component from next/image
+import { Upload } from "lucide-react";
+import Image from "next/image";
 
 // Validation Schema
 const schema = yup.object().shape({
@@ -61,7 +61,9 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
   return (
     <div className="mb-8 p-4 border rounded-lg shadow-md bg-white">
       {/* Simple Subheading */}
-      <h2 className="text-lg font-semibold mb-3">Add a New Product</h2>
+      <h2 className="text-lg font-semibold mb-3 text-gray-900">
+        Add a New Product
+      </h2>
 
       {/* Form */}
       <form
@@ -70,7 +72,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
       >
         {/* Product Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
+          <label className="block text-sm font-medium text-gray-700 ">
             Product Name
           </label>
           <Controller
@@ -81,20 +83,18 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
               <input
                 {...field}
                 type="text"
-                className="block w-full p-2 border-gray-300 border rounded-md"
+                className="block w-full p-2 border-gray-300 border rounded-md bg-white text-gray-900"
               />
             )}
           />
           {errors.name && (
-            <p className="text-red-500 text-xs">{errors.name.message}</p>
+            <p className="text-red-500 text-xs mt-1">{errors.name.message}</p>
           )}
         </div>
 
         {/* Price */}
         <div>
-          <label className="block text-sm font-medium text-gray-700">
-            Price
-          </label>
+          <label className="block text-sm font-medium">Price</label>
           <div className="relative">
             <Controller
               name="price"
@@ -105,16 +105,16 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
                   {...field}
                   type="number"
                   step="0.01"
-                  className="block w-full p-2 border-gray-300 border rounded-md pr-12"
+                  className="block w-full p-2 border-gray-300 border rounded-md pr-12 bg-white text-gray-900"
                 />
               )}
             />
             <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-              <span className="text-gray-500">LKR</span>
+              <span className="text-gray-900">LKR</span>
             </div>
           </div>
           {errors.price && (
-            <p className="text-red-500 text-xs">{errors.price.message}</p>
+            <p className="text-red-500 text-xs mt-1">{errors.price.message}</p>
           )}
         </div>
 
@@ -131,12 +131,12 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
               <input
                 {...field}
                 type="number"
-                className="block w-full p-2 border-gray-300 border rounded-md"
+                className="block w-full p-2 border-gray-300 border rounded-md bg-white text-gray-900"
               />
             )}
           />
           {errors.stockQuantity && (
-            <p className="text-red-500 text-xs">
+            <p className="text-red-500 text-xs mt-1">
               {errors.stockQuantity.message}
             </p>
           )}
@@ -154,7 +154,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
             render={({ field }) => (
               <select
                 {...field}
-                className="block w-full p-2 border-gray-300 border rounded-md"
+                className="block w-full p-2 border-gray-300 border rounded-md bg-white"
               >
                 <option value="" disabled>
                   Select status
@@ -166,7 +166,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
             )}
           />
           {errors.status && (
-            <p className="text-red-500 text-xs">{errors.status.message}</p>
+            <p className="text-red-500 text-xs mt-1">{errors.status.message}</p>
           )}
         </div>
 
@@ -182,13 +182,15 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
             render={({ field }) => (
               <textarea
                 {...field}
-                className="block w-full p-2 border-gray-300 border rounded-md resize-none h-20"
+                className="block w-full p-2 border-gray-300 border rounded-md resize-none h-20 bg-white"
                 rows={3}
               />
             )}
           />
           {errors.details && (
-            <p className="text-red-500 text-xs">{errors.details.message}</p>
+            <p className="text-red-500 text-xs mt-1">
+              {errors.details.message}
+            </p>
           )}
         </div>
 
@@ -197,7 +199,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
           <label className="block text-sm font-medium text-gray-700">
             Product Image
           </label>
-          <div className="mt-1 flex justify-center px-4 pt-4 pb-4 border-2 border-gray-200 border-dashed rounded-md">
+          <div className="mt-1 flex justify-center px-4 pt-4 pb-4 border-2 border-gray-300 border-dashed rounded-md">
             <div className="space-y-1 text-center">
               {imagePreview ? (
                 <Image
@@ -239,7 +241,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
             </div>
           </div>
           {errors.image && (
-            <p className="text-red-500 text-xs">{errors.image.message}</p>
+            <p className="text-red-500 text-xs mt-1">{errors.image.message}</p>
           )}
         </div>
 

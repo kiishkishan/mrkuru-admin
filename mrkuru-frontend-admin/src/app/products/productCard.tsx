@@ -24,17 +24,22 @@ const ProductCard = ({ product }: ProductCardProps) => {
     "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/no_product_img_found.webp";
 
   return (
-    <div className="border border-gray-100 shadow-lg hover:shadow-xl rounded-xl p-6 max-w-full w-full mx-auto bg-gradient-to-b from-white to-gray-50 transition-all duration-300 hover:-translate-y-1.5">
+    <div
+      className="border border-gray-100 shadow-lg hover:shadow-xl rounded-xl p-6 max-w-full w-full mx-auto 
+    bg-gradient-to-b from-white to-gray-50 transition-all duration-300 hover:-translate-y-1.5"
+    >
       <div className="flex flex-col items-center">
-        <div className="relative mb-4 rounded-xl w-36 h-36 bg-gray-100 overflow-hidden">
+        <div className="relative mb-4 rounded-xl w-36 h-36 bg-gray-100 overflow-hidden aspect-square">
           <Image
             src={product?.imageUrl || fallbackImage}
             alt={product?.name}
             fill
-            className={`rounded-xl object-cover ${
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className={`rounded-xl object-cover w-auto h-auto ${
               imageLoaded ? "opacity-100" : "opacity-0"
             } transition-opacity duration-300`}
-            loading="lazy"
+            quality={80}
+            priority
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {
               (e.target as HTMLImageElement).src = fallbackImage;

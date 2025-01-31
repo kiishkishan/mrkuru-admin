@@ -83,7 +83,6 @@ const Products = () => {
             ))}
       </div>
 
-      {/* Added Empty State with preserved comment styling */}
       {!isLoading && products?.length === 0 && (
         <div className="text-center text-gray-500 py-8">
           No products found {searchTerm && `for "${searchTerm}"`}
