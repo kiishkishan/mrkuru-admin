@@ -5,16 +5,19 @@ import { setIsSidebarCollapsed } from "@/state";
 import {
   Archive,
   CircleDollarSign,
-  ClipboardCheck,
   Layout,
   LucideIcon,
   Menu,
   Package,
+  ShoppingCart,
   SlidersHorizontal,
   User,
+  WalletCards,
 } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { memo } from "react";
 
 interface SidebarLinkProps {
   href: string;
@@ -23,37 +26,36 @@ interface SidebarLinkProps {
   isColapsed: boolean;
 }
 
-const SidebarLink = ({
-  href,
-  icon: Icon,
-  label,
-  isColapsed,
-}: SidebarLinkProps) => {
-  const pathname = usePathname();
-  const isActive =
-    pathname === href || (pathname === "/" && href === "/dashboard"); // handle link highlighting
+const SidebarLink = memo(
+  ({ href, icon: Icon, label, isColapsed }: SidebarLinkProps) => {
+    const pathname = usePathname();
+    const isActive =
+      pathname === href || (pathname === "/" && href === "/dashboard"); // handle link highlighting
 
-  return (
-    <Link href={href}>
-      <div
-        className={`cursor-pointer flex items-center ${
-          isColapsed ? "justify-center py-4" : "justify-start py-4 px-8"
-        } hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
-          isActive ? "bg-blue-200 text-white" : "text-gray-700" // text-gray-700 is optional
-        }`}
-      >
-        <Icon className="w-6 h-6 !text-gray-700" />
-        <span
-          className={`${
-            isColapsed ? "hidden" : "block"
-          } font-medium text-gray-700`}
+    return (
+      <Link href={href}>
+        <div
+          className={`cursor-pointer flex items-center ${
+            isColapsed ? "justify-center py-4" : "justify-start py-4 px-8"
+          } hover:text-blue-500 hover:bg-blue-100 gap-3 transition-colors ${
+            isActive ? "bg-blue-200 text-white" : "text-gray-700" // text-gray-700 is optional
+          }`}
         >
-          {label}
-        </span>
-      </div>
-    </Link>
-  );
-};
+          <Icon className="w-6 h-6 !text-gray-700" />
+          <span
+            className={`${
+              isColapsed ? "hidden" : "block"
+            } font-medium text-gray-700`}
+          >
+            {label}
+          </span>
+        </div>
+      </Link>
+    );
+  }
+);
+
+SidebarLink.displayName = "SidebarLink";
 
 const Sidebar = () => {
   const dispatch = useAppDispatch();
@@ -74,10 +76,17 @@ const Sidebar = () => {
       {/* TOP LOGO */}
       <div
         className={`flex gap-3 justify-between md:justify-normal items-center pt-8 ${
-          isSidebarCollapsed ? "px-5" : "px-8"
+          isSidebarCollapsed ? "px-1.5" : "px-2.5"
         }`}
       >
-        <div>logo</div>
+        <Image
+          src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/mrkuru_logo.webp"
+          alt="Logo"
+          width={85}
+          height={85}
+          className={`rounded-xl object-cover w-auto h-auto transition-opacity duration-300`}
+          priority
+        />
         <h1
           className={`${
             isSidebarCollapsed ? "hidden" : "block"
@@ -114,27 +123,33 @@ const Sidebar = () => {
           isColapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/users"
-          icon={User}
-          label="Users"
+          href="/sales"
+          icon={ShoppingCart}
+          label="Sales"
           isColapsed={isSidebarCollapsed}
         />
         <SidebarLink
-          href="/orders"
-          icon={ClipboardCheck}
-          label="Orders"
-          isColapsed={isSidebarCollapsed}
-        />
-        <SidebarLink
-          href="/settings"
-          icon={SlidersHorizontal}
-          label="Settings"
+          href="/purchases"
+          icon={WalletCards}
+          label="Purchases"
           isColapsed={isSidebarCollapsed}
         />
         <SidebarLink
           href="/expenses"
           icon={CircleDollarSign}
           label="Expenses"
+          isColapsed={isSidebarCollapsed}
+        />
+        <SidebarLink
+          href="/users"
+          icon={User}
+          label="Users"
+          isColapsed={isSidebarCollapsed}
+        />
+        <SidebarLink
+          href="/settings"
+          icon={SlidersHorizontal}
+          label="Settings"
           isColapsed={isSidebarCollapsed}
         />
       </div>

@@ -7,6 +7,7 @@ export interface Product {
   rating?: number;
   stockQuantity: number;
   details?: string;
+  imageUrl: string;
 }
 
 export interface ProductStatus {
@@ -22,9 +23,9 @@ export interface NewProduct {
   productId: string;
   name: string;
   price: number;
-  rating?: number;
   stockQuantity: number;
   details?: string;
+  imageUrl: string;
 }
 
 export interface SaleSummary {
@@ -67,12 +68,14 @@ export const api = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   }),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "Product"],
+  tagTypes: ["DashboardMetrics", "Product", "ProductStatus"],
   endpoints: (build) => ({
+    // Dashboard
     getDashboardMetrics: build.query<DashboardMetrics, void>({
       query: () => "dashboard/metrics",
       providesTags: ["DashboardMetrics"],
     }),
+    // Products
     getProducts: build.query<Product[], string | void>({
       query: (search) => ({
         url: "products",
@@ -104,6 +107,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Product"],
     }),
+    // Product Status
+    getProductStatus: build.query<ProductStatus[], string | void>({
+      query: (search) => ({
+        url: "productStatus",
+        params: search ? { search } : {},
+      }),
+      providesTags: ["ProductStatus"],
+    }),
   }),
 });
 
@@ -113,4 +124,5 @@ export const {
   useCreateProductMutation,
   useHoldSellingProductMutation,
   useDeleteProductMutation,
+  useGetProductStatusQuery,
 } = api;

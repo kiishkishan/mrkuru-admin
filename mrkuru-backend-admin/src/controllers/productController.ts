@@ -17,6 +17,9 @@ export const getProducts = async (
           mode: "insensitive",
         },
       },
+      orderBy: {
+        name: "asc",
+      },
       select: {
         productId: true,
         name: true,
@@ -24,6 +27,7 @@ export const getProducts = async (
         rating: true,
         stockQuantity: true,
         details: true,
+        imageUrl: true,
         ProductStatus: {
           select: {
             productStatusId: true,
@@ -44,7 +48,8 @@ export const createProduct = async (
   req: Request,
   res: Response
 ): Promise<void> => {
-  const { productId, name, price, rating, stockQuantity, details } = req.body;
+  const { productId, name, price, rating, stockQuantity, details, imageUrl } =
+    req.body;
   try {
     const product = await prisma.products.create({
       data: {
@@ -54,8 +59,9 @@ export const createProduct = async (
         rating,
         stockQuantity,
         details,
+        imageUrl,
         ProductStatus: {
-          connect: { productStatusId: "0d9921b7-df37-4d8d-89a0-31a00259ca8b" }, // Always set to 'In Stock'
+          connect: { productStatusId: "0d9921b7-df37-4d8d-89a0-31a00259ca8b" }, // Always set to 'In Stock' by default
         },
       },
     });

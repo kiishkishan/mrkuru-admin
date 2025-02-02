@@ -1,7 +1,12 @@
 import { useGetProductsQuery } from "@/state/api";
 
-const useGetProducts = () => {
-  const { data: products, isLoading, isError, refetch } = useGetProductsQuery();
+const useGetProducts = (searchTerm?: string) => {
+  const {
+    data: products,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetProductsQuery(searchTerm);
 
   return {
     products,
