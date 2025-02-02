@@ -110,7 +110,7 @@ export const api = createApi({
     // Product Status
     getProductStatus: build.query<ProductStatus[], string | void>({
       query: (search) => ({
-        url: "products",
+        url: "productStatus",
         params: search ? { search } : {},
       }),
       providesTags: ["ProductStatus"],

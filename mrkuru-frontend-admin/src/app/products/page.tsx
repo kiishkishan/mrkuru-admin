@@ -9,20 +9,20 @@ import ProductCard from "@/app/products/productCard";
 import useGetProducts from "@/app/(hooks)/getProducts";
 import ProductCardSkeleton from "@/app/(components)/Skeleton/productCardSkeleton";
 
-// type ProductFormData = {
-//   productId: string;
-//   name: string;
-//   price: number;
-//   stockQuantity: number;
-//   details?: string;
-//   imageUrl: string;
-// };
+type ProductFormData = {
+  name: string;
+  price: number;
+  stockQuantity: number;
+  details: string;
+  image: object; // or use File if it's a file input
+};
 
 const Products = () => {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isCreateAreaOpen, setIsCreateAreaOpen] = useState<boolean>(false);
 
-  const { products, isLoading, isError } = useGetProducts(searchTerm);
+  const { products, isLoading, isError, refetchProducts } =
+    useGetProducts(searchTerm);
 
   // const [createProduct] = useCreateProductMutation();
   // const handleCreateProduct = async (productData: ProductFormData) => {
@@ -30,6 +30,24 @@ const Products = () => {
   // };
 
   const toggleCreateArea = () => setIsCreateAreaOpen((prev) => !prev);
+
+  const handleCreateProduct = async (productData: ProductFormData) => {
+    try {
+      // Perform the product creation logic here
+      // Example: Call an API to create the product
+      // await createProduct(productData);
+
+      console.log("Product created:", productData);
+
+      // Refetch the product list to include the newly created product
+      await refetchProducts();
+
+      // Close the create product form
+      setIsCreateAreaOpen(false);
+    } catch (error) {
+      console.error("Error creating product:", error);
+    }
+  };
 
   if (isError && !isLoading) {
     return (
@@ -68,9 +86,7 @@ const Products = () => {
       </div>
 
       {/* CREATE PRODUCT AREA */}
-      {isCreateAreaOpen && (
-        <CreateProductForm onCreate={() => setIsCreateAreaOpen(false)} />
-      )}
+      {isCreateAreaOpen && <CreateProductForm onCreate={handleCreateProduct} />}
 
       {/* PRODUCT LIST */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10 justify-between">
