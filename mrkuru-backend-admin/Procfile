@@ -1,0 +1,1 @@
+web: node mrkuru-backend-admin/index.js
