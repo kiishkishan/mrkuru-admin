@@ -1,1 +1,1 @@
-web: node mrkuru-backend-admin/src/index.ts
+web: node mrkuru-backend-admin/dist/src/index.js
