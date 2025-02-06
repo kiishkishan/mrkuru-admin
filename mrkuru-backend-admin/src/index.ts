@@ -27,8 +27,8 @@ app.use("/products", productRoutes); //http://localhost:3000/products
 app.use("/productStatus", productStatusRoutes); //http://localhost:
 
 // SERVER
-const port = Number(process.env.PORT) || 5000;
+const port = process.env.PORT || 5000;
 
-app.listen(port, "0.0.0.0", () => {
+app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });

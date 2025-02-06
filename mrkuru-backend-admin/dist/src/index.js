@@ -28,7 +28,7 @@ app.use("/dashboard", dashboardRoutes_1.default); // http://localhost:3000/dashb
 app.use("/products", productRoutes_1.default); //http://localhost:3000/products
 app.use("/productStatus", productStatusRoutes_1.default); //http://localhost:
 // SERVER
-const port = Number(process.env.PORT) || 5000;
-app.listen(port, "0.0.0.0", () => {
+const port = process.env.PORT || 5000;
+app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });

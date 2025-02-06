@@ -87,13 +87,6 @@ const Sidebar = () => {
           className={`rounded-xl object-cover w-auto h-auto transition-opacity duration-300`}
           priority
         />
-        <h1
-          className={`${
-            isSidebarCollapsed ? "hidden" : "block"
-          } font-extrabold text-2xl`}
-        >
-          Mr.Kuru
-        </h1>
         <button
           className="md:hidden px-3 py-3 bg-gray-100 rounded-full hover:bg-blue-100"
           onClick={toggleSidebar}
