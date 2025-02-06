@@ -75,15 +75,15 @@ const Sidebar = () => {
     <div className={sidebarClassNames}>
       {/* TOP LOGO */}
       <div
-        className={`flex gap-3 justify-between md:justify-normal items-center pt-8 ${
-          isSidebarCollapsed ? "px-1.5" : "px-2.5"
+        className={`flex gap-3 justify-evenly md:justify-normal items-center pt-8 ${
+          isSidebarCollapsed ? "px-1.5" : "mx-10"
         }`}
       >
         <Image
-          src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/mrkuru_logo.webp"
+          src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/mrkuru_logo_transparent.webp"
           alt="Logo"
-          width={85}
-          height={85}
+          width={150}
+          height={150}
           className={`rounded-xl object-cover w-auto h-auto transition-opacity duration-300`}
           priority
         />
