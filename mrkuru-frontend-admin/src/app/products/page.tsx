@@ -51,7 +51,7 @@ const Products = () => {
 
   if (isError && !isLoading) {
     return (
-      <div className="py-4 text-red-500 text-center">
+      <div className="py-4 text-red-500 text-center text-lg font-bold">
         Failed to fetch products
       </div>
     );
