@@ -53,6 +53,9 @@ const Inventory = () => {
       dispatch(
         showToast("Product hold status updated successfully!", "success")
       );
+
+      // Refetch products after updating hold status
+      refetchProducts();
     } catch (error) {
       console.error("Failed to hold selling product:", error);
 
@@ -269,7 +272,9 @@ const Inventory = () => {
                 })
               }
             >
-              Hold Selling
+              {params?.row?.ProductStatus?.status === "On Hold"
+                ? "Revert Back"
+                : "Hold Selling"}
             </button>
 
             {/* Delete Button */}
