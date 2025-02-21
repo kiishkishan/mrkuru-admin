@@ -1,13 +1,43 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-export interface Product {
+// getProducts type
+export interface Products {
   productId: string;
   name: string;
   price: number;
   rating?: number;
   stockQuantity: number;
-  details?: string;
+  details: string;
   imageUrl: string;
+}
+
+// createProduct types
+export interface Product {
+  name: string;
+  price: number;
+  stockQuantity: number;
+  details: string;
+  image: File;
+  status?: string;
+  productId?: string;
+}
+
+export interface NewProduct {
+  name: string;
+  price: number;
+  stockQuantity: number;
+  details: string;
+  image: File;
+  status?: string;
+  productId?: string;
+}
+
+export interface ImageFile {
+  image: File;
+}
+
+export interface FormData {
+  image: File;
 }
 
 export interface ProductStatus {
@@ -17,15 +47,6 @@ export interface ProductStatus {
 
 export interface HoldSellingProduct {
   productId: string;
-}
-
-export interface NewProduct {
-  productId: string;
-  name: string;
-  price: number;
-  stockQuantity: number;
-  details?: string;
-  imageUrl: string;
 }
 
 export interface SaleSummary {
@@ -76,19 +97,44 @@ export const api = createApi({
       providesTags: ["DashboardMetrics"],
     }),
     // Products
-    getProducts: build.query<Product[], string | void>({
+    getProducts: build.query<Products[], string | void>({
       query: (search) => ({
         url: "products",
         params: search ? { search } : {},
       }),
       providesTags: ["Product"],
     }),
-    createProduct: build.mutation<Product, NewProduct>({
-      query: (newProduct) => ({
-        url: "products",
+    uploadImagetoS3: build.mutation<ImageFile, ImageFile>({
+      query: (imageFile) => ({
+        url: "products/uploadImagetoS3",
         method: "POST",
-        body: newProduct,
+        body: imageFile,
       }),
+      invalidatesTags: ["Product"],
+    }),
+    createProduct: build.mutation<Product, NewProduct>({
+      query: (newProduct: NewProduct) => {
+        const formData = new FormData();
+
+        Object.entries(newProduct).forEach(([key, value]) => {
+          if (value instanceof File) {
+            formData.append(key, value); // Append file as is
+          } else {
+            formData.append(key, String(value)); // Convert non-file values to string
+          }
+        });
+
+        console.log(
+          Object.fromEntries(formData.entries()),
+          "formData append in query"
+        );
+
+        return {
+          url: "products",
+          method: "POST",
+          body: formData,
+        };
+      },
       invalidatesTags: ["Product"],
     }),
     holdSellingProduct: build.mutation<Product, HoldSellingProduct>({
@@ -121,6 +167,7 @@ export const api = createApi({
 export const {
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
+  useUploadImagetoS3Mutation,
   useCreateProductMutation,
   useHoldSellingProductMutation,
   useDeleteProductMutation,

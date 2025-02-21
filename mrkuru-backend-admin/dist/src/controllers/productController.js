@@ -8,10 +8,23 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProduct = exports.holdSellingProduct = exports.createProduct = exports.getProducts = void 0;
 const client_1 = require("@prisma/client");
+const client_s3_1 = require("@aws-sdk/client-s3");
+const sharp_1 = __importDefault(require("sharp"));
 const prisma = new client_1.PrismaClient(); // Prisma Client instance
+// Configure the S3 client
+const s3 = new client_s3_1.S3Client({
+    region: process.env.AWS_REGION,
+    credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
+    },
+});
 const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -50,46 +63,56 @@ const getProducts = (req, res) => __awaiter(void 0, void 0, void 0, function* ()
     }
 });
 exports.getProducts = getProducts;
-const createProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { productId, name, price, rating, stockQuantity, details, imageUrl } = req.body;
+const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const product = yield prisma.products.create({
+        console.log("File:", req.file);
+        console.log("Body:", req.body);
+        const { name, price, rating, stockQuantity, details, productId, status } = req.body;
+        if (!productId || !name || !price || !stockQuantity) {
+            res.status(400).json({ error: "Missing required fields" });
+            return;
+        }
+        let imageUrl = "";
+        if (req.file) {
+            const compressedImageBuffer = yield (0, sharp_1.default)(req.file.buffer)
+                .resize(800) // Resize width to 800px
+                .toFormat("webp") // Convert to WebP
+                .webp({ quality: 80 }) // Set quality (0-100)
+                .toBuffer();
+            // Generate unique filename
+            const fileKey = `product_${productId}.webp`;
+            // Upload to S3
+            yield s3.send(new client_s3_1.PutObjectCommand({
+                Bucket: process.env.AWS_S3_BUCKET_NAME,
+                Key: fileKey,
+                Body: compressedImageBuffer,
+                ContentType: "image/webp",
+            }));
+            imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+        }
+        // Store product in DB
+        const newProduct = yield prisma.products.create({
             data: {
                 productId,
                 name,
-                price,
-                rating,
-                stockQuantity,
+                price: Number(price),
+                rating: Number("4.5"),
+                stockQuantity: parseInt(stockQuantity),
                 details,
                 imageUrl,
                 ProductStatus: {
-                    connect: { productStatusId: "0d9921b7-df37-4d8d-89a0-31a00259ca8b" }, // Always set to 'In Stock' by default
+                    connect: { productStatusId: status }, // Always set to 'In Stock' by default
                 },
             },
         });
-        res.status(201).json(product);
+        res.json({
+            message: "Product created successfully",
+            newProduct,
+        });
     }
     catch (error) {
-        console.error("Error creating product:", error); // Logs the complete error to the console
-        if (error instanceof client_1.Prisma.PrismaClientKnownRequestError) {
-            switch (error.code) {
-                case "P2002": // Unique constraint violation to find the exact issue
-                    res.status(400).json({
-                        message: "A product with the same unique identifier already exists.",
-                    });
-                    break;
-                default:
-                    res.status(400).json({
-                        message: `Prisma error: ${error.message}`,
-                    });
-            }
-        }
-        else {
-            res.status(500).json({
-                message: "An unexpected error occurred.",
-                error: error.message,
-            });
-        }
+        console.error("Error processing product:", error);
+        next(error); // Pass the error to Express error handler
     }
 });
 exports.createProduct = createProduct;
@@ -183,6 +206,23 @@ const deleteProduct = (req, res) => __awaiter(void 0, void 0, void 0, function* 
         if (!existingProduct) {
             res.status(404).json({ message: "Product not found." });
             return;
+        }
+        // Step 3: Extract S3 Image Key from URL (assuming stored in `imageUrl` field)
+        const imageUrl = existingProduct.imageUrl; // Adjust according to DB schema
+        if (imageUrl) {
+            const bucketName = process.env.AWS_S3_BUCKET_NAME;
+            const key = imageUrl.split("/").slice(-1)[0]; // Extract filename from URL
+            // Step 4: Delete Image from S3
+            try {
+                yield s3.send(new client_s3_1.DeleteObjectCommand({
+                    Bucket: bucketName,
+                    Key: key,
+                }));
+                console.log(`Deleted S3 image: ${key}`);
+            }
+            catch (s3Error) {
+                console.error("Error deleting image from S3:", s3Error);
+            }
         }
         // Step 3: Delete the product
         yield prisma.products.delete({

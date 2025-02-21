@@ -26,7 +26,7 @@ app.use((0, cors_1.default)());
 // ROUTES
 app.use("/dashboard", dashboardRoutes_1.default); // http://localhost:3000/dashboard/metrics
 app.use("/products", productRoutes_1.default); //http://localhost:3000/products
-app.use("/productStatus", productStatusRoutes_1.default); //http://localhost:
+app.use("/productStatus", productStatusRoutes_1.default); //http://localhost:3000/productStatus
 // SERVER
 const port = process.env.PORT || 5000;
 app.listen(port, () => {

@@ -1,7 +1,22 @@
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { PrismaClient, Prisma } from "@prisma/client";
+import {
+  S3Client,
+  PutObjectCommand,
+  DeleteObjectCommand,
+} from "@aws-sdk/client-s3";
+import sharp from "sharp";
 
 const prisma = new PrismaClient(); // Prisma Client instance
+
+// Configure the S3 client
+const s3 = new S3Client({
+  region: process.env.AWS_REGION,
+  credentials: {
+    accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+  },
+});
 
 export const getProducts = async (
   req: Request,
@@ -46,47 +61,68 @@ export const getProducts = async (
 
 export const createProduct = async (
   req: Request,
-  res: Response
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
-  const { productId, name, price, rating, stockQuantity, details, imageUrl } =
-    req.body;
   try {
-    const product = await prisma.products.create({
+    console.log("File:", req.file);
+    console.log("Body:", req.body);
+
+    const { name, price, rating, stockQuantity, details, productId, status } =
+      req.body;
+
+    if (!productId || !name || !price || !stockQuantity) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+
+    let imageUrl = "";
+    if (req.file) {
+      const compressedImageBuffer = await sharp(req.file.buffer)
+        .resize(800) // Resize width to 800px
+        .toFormat("webp") // Convert to WebP
+        .webp({ quality: 80 }) // Set quality (0-100)
+        .toBuffer();
+
+      // Generate unique filename
+      const fileKey = `product_${productId}.webp`;
+
+      // Upload to S3
+      await s3.send(
+        new PutObjectCommand({
+          Bucket: process.env.AWS_S3_BUCKET_NAME!,
+          Key: fileKey,
+          Body: compressedImageBuffer,
+          ContentType: "image/webp",
+        })
+      );
+
+      imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;
+    }
+
+    // Store product in DB
+    const newProduct = await prisma.products.create({
       data: {
         productId,
         name,
-        price,
-        rating,
-        stockQuantity,
+        price: Number(price),
+        rating: Number("4.5"),
+        stockQuantity: parseInt(stockQuantity),
         details,
         imageUrl,
         ProductStatus: {
-          connect: { productStatusId: "0d9921b7-df37-4d8d-89a0-31a00259ca8b" }, // Always set to 'In Stock' by default
+          connect: { productStatusId: status }, // Always set to 'In Stock' by default
         },
       },
     });
-    res.status(201).json(product);
-  } catch (error: any) {
-    console.error("Error creating product:", error); // Logs the complete error to the console
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      switch (error.code) {
-        case "P2002": // Unique constraint violation to find the exact issue
-          res.status(400).json({
-            message:
-              "A product with the same unique identifier already exists.",
-          });
-          break;
-        default:
-          res.status(400).json({
-            message: `Prisma error: ${error.message}`,
-          });
-      }
-    } else {
-      res.status(500).json({
-        message: "An unexpected error occurred.",
-        error: error.message,
-      });
-    }
+
+    res.json({
+      message: "Product created successfully",
+      newProduct,
+    });
+  } catch (error) {
+    console.error("Error processing product:", error);
+    next(error); // Pass the error to Express error handler
   }
 };
 
@@ -194,6 +230,26 @@ export const deleteProduct = async (
     if (!existingProduct) {
       res.status(404).json({ message: "Product not found." });
       return;
+    }
+
+    // Step 3: Extract S3 Image Key from URL (assuming stored in `imageUrl` field)
+    const imageUrl = existingProduct.imageUrl; // Adjust according to DB schema
+    if (imageUrl) {
+      const bucketName = process.env.AWS_S3_BUCKET_NAME!;
+      const key = imageUrl.split("/").slice(-1)[0]; // Extract filename from URL
+
+      // Step 4: Delete Image from S3
+      try {
+        await s3.send(
+          new DeleteObjectCommand({
+            Bucket: bucketName,
+            Key: key,
+          })
+        );
+        console.log(`Deleted S3 image: ${key}`);
+      } catch (s3Error) {
+        console.error("Error deleting image from S3:", s3Error);
+      }
     }
 
     // Step 3: Delete the product

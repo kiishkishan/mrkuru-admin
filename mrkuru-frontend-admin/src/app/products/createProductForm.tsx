@@ -23,7 +23,7 @@ const schema = yup.object().shape({
     .min(1, "Stock cannot be zero or negative")
     .required("Stock is required"),
   details: yup.string().required("Product details are required"),
-  image: yup.mixed().required("Product image is required"),
+  image: yup.mixed<File>().required("Product image is required"),
 });
 
 type ProductFormData = yup.InferType<typeof schema> & {
@@ -84,7 +84,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
   };
 
   const onSubmit = (data: ProductFormData) => {
-    console.log("ProductFormData");
+    console.log("ProductFormData", data);
     onCreate({ ...data, status: defaultStatus, productId: uuidv4() });
     reset();
     setImagePreview(null);
