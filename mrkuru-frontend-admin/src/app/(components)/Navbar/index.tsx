@@ -71,6 +71,7 @@ const Navbar = () => {
               height={25}
               className="rounded-full object-cover"
               priority
+              fill
             />
             <span className="font-semibold">Kishanth</span>
           </div>
