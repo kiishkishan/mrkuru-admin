@@ -67,7 +67,6 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
-      //add this base to your theme
       base: {
         input: {
           "@apply text-base sm:text-sm": {},
