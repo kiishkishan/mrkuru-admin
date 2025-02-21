@@ -192,7 +192,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
                   <input
                     {...field}
                     type="number"
-                    className="block w-full p-2 border-gray-300 border rounded-md pr-12 bg-white text-gray-900"
+                    className="block w-full p-2 border-gray-300 border rounded-md pr-12 bg-white text-gray-900 text-base sm:text-sm"
                   />
                   {field.value > 0 && (
                     <button
