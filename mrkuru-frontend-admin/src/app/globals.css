@@ -14,6 +14,12 @@ html,body,#root,.app {
   @apply text-gray-900;
 }
 
+input,
+textarea,
+select {
+  @apply text-base sm:text-sm;
+}
+
 /* Custom Grid Rows Start - Customized Tailwind Class in Dashboard for designated Viewport */
 @media (min-width: 768px) {
   .custom-grid-rows {

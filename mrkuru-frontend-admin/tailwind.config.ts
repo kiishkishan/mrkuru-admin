@@ -67,17 +67,6 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
-      base: {
-        input: {
-          "@apply text-base sm:text-sm": {},
-        },
-        textarea: {
-          "@apply text-base sm:text-sm": {},
-        },
-        select: {
-          "@apply text-base sm:text-sm": {},
-        },
-      },
     },
   },
   plugins: [createThemes(themes)],

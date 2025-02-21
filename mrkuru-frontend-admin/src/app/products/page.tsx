@@ -66,7 +66,7 @@ const Products = () => {
     <div className="mx-auto pb-5 w-full">
       {/* SEARCH BAR */}
       <div className="mb-6">
-        <div className="relative flex items-center border-2 border-gray-300 rounded-lg shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition-all duration-300">
+        <div className="relative flex items-center border-2 border-gray-300 rounded-lg shadow-sm focus-within:border-blue-500 focus-within:ring-2 focus-within:ring-blue-200 transition-all duration-300 text-base sm:text-sm">
           <SearchIcon className="w-5 h-5 ml-4 text-gray-500 shrink-0" />
           <input
             aria-label="Search products"
