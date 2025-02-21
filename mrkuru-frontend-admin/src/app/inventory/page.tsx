@@ -170,10 +170,9 @@ const Inventory = () => {
         ),
         valueGetter: (value, row) => (row.rating ? row.rating : "N/A"),
         renderCell: (params) => {
-          const ratingValue = params?.value;
           return (
             <div className="flex items-center justify-center align-middle h-full w-full">
-              <Rating rating={ratingValue || 0} />
+              <Rating rating={params?.value || 0} />
             </div>
           );
         },
