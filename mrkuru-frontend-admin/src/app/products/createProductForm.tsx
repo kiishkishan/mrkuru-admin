@@ -116,7 +116,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
                 <input
                   {...field}
                   type="text"
-                  className="block w-full p-2 border-gray-300 border rounded-md bg-white text-gray-900 pr-10"
+                  className="block w-full p-2 border-gray-300 border rounded-md bg-white text-gray-900 pr-10 text-base sm:text-sm"
                 />
                 {field.value !== "" && (
                   <button
@@ -149,7 +149,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
                     {...field}
                     type="number"
                     step={0.01}
-                    className="block w-full p-2 border-gray-300 border rounded-md pr-12 bg-white text-gray-900"
+                    className="block w-full p-2 border-gray-300 border rounded-md pr-12 bg-white text-gray-900 text-base sm:text-sm"
                     onBlur={(e) => {
                       const value = parseFloat(e.target.value);
                       if (!isNaN(value)) {
