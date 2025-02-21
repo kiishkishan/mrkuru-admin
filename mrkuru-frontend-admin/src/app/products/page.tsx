@@ -1,6 +1,5 @@
 "use client";
 
-// import { useCreateProductMutation } from "@/state/api";
 import { PlusCircleIcon, SearchIcon } from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/(components)/Header";
@@ -8,13 +7,26 @@ import CreateProductForm from "@/app/products/createProductForm";
 import ProductCard from "@/app/products/productCard";
 import useGetProducts from "@/app/(hooks)/getProducts";
 import ProductCardSkeleton from "@/app/(components)/Skeleton/productCardSkeleton";
+import { useCreateProductMutation } from "@/state/api";
 
 type ProductFormData = {
   name: string;
   price: number;
   stockQuantity: number;
   details: string;
-  image: object; // or use File if it's a file input
+  image: File;
+  productId?: string;
+  status?: string;
+};
+
+type Products = {
+  productId: string;
+  name: string;
+  price: number;
+  rating?: number;
+  stockQuantity: number;
+  details: string;
+  imageUrl: string;
 };
 
 const Products = () => {
@@ -24,30 +36,23 @@ const Products = () => {
   const { products, isLoading, isError, refetchProducts } =
     useGetProducts(searchTerm);
 
-  // const [createProduct] = useCreateProductMutation();
-  // const handleCreateProduct = async (productData: ProductFormData) => {
-  //   await createProduct(productData);
-  // };
-
-  const toggleCreateArea = () => setIsCreateAreaOpen((prev) => !prev);
-
+  const [createProduct] = useCreateProductMutation();
   const handleCreateProduct = async (productData: ProductFormData) => {
     try {
-      // Perform the product creation logic here
-      // Example: Call an API to create the product
-      // await createProduct(productData);
-
-      console.log("Product created:", productData);
-
-      // Refetch the product list to include the newly created product
-      await refetchProducts();
-
-      // Close the create product form
+      console.log("Product Data", productData.image);
+      await createProduct(productData);
+      setTimeout(() => {
+        refetchProducts();
+      }, 1000);
       setIsCreateAreaOpen(false);
+      // Optionally, you can add success handling here
     } catch (error) {
-      console.error("Error creating product:", error);
+      console.error("Failed to create product", error);
+      // Optionally, you can add error handling here
     }
   };
+
+  const toggleCreateArea = () => setIsCreateAreaOpen((prev) => !prev);
 
   if (isError && !isLoading) {
     return (
