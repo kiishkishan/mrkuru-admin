@@ -4,7 +4,7 @@ import {
   useDeleteProductMutation,
   useHoldSellingProductMutation,
 } from "@/state/api";
-import React, { memo, useMemo, useCallback, useState } from "react";
+import React, { useMemo, useCallback, useState } from "react";
 import Header from "@/app/(components)/Header";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import Rating from "@/app/(components)/Rating";
@@ -346,4 +346,4 @@ const Inventory = () => {
   );
 };
 
-export default memo(Inventory);
+export default Inventory;
