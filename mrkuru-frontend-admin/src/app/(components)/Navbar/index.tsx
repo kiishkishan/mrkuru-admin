@@ -69,9 +69,8 @@ const Navbar = () => {
               alt="Profile"
               width={25}
               height={25}
-              className="rounded-full h-full object-cover"
+              className="rounded-full object-contain"
               priority
-              style={{ width: "auto" }}
             />
             <span className="font-semibold">Kishanth</span>
           </div>
