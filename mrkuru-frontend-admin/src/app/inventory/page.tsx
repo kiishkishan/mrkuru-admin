@@ -20,9 +20,24 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import Modal from "@/app/(components)/Modal";
 import { showToast } from "@/state/thunks/alertThunk";
 import useGetProducts from "@/app/(hooks)/getProducts";
+import StatusFilter from "../(components)/StatusFilter";
 
 interface ProductID {
   productId: string;
+}
+
+interface ProductStatus {
+  status: string;
+}
+
+interface Products {
+  // Other product properties
+  name: string;
+  details: string;
+  price: number;
+  stockQuantity: number;
+  rating: number;
+  ProductStatus?: ProductStatus | null; // Making it optional
 }
 
 const Inventory = () => {
@@ -39,6 +54,7 @@ const Inventory = () => {
   // local usestate
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
+  const [statusFilter, setStatusFilter] = useState("All");
 
   const dispatch = useAppDispatch();
 
@@ -106,6 +122,10 @@ const Inventory = () => {
         );
       }
     }
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
   };
 
   const columns: GridColDef[] = useMemo(
@@ -307,7 +327,16 @@ const Inventory = () => {
     },
   });
 
-  console.log(products, "products in inventory");
+  // filter the products according to the status
+  const filteredProducts = useMemo(() => {
+    if (statusFilter === "All") {
+      return products;
+    }
+
+    return products?.filter(
+      (product) => (product as Products).ProductStatus?.status === statusFilter
+    );
+  }, [products, statusFilter]);
 
   if (isLoading) {
     return <div className="py-4 animate-pulse">Loading...</div>;
@@ -324,9 +353,13 @@ const Inventory = () => {
   return (
     <div className="flex flex-col ">
       <Header name="Inventory" />
+      <StatusFilter
+        statusFilter={statusFilter}
+        onStatusFilterChange={handleStatusFilterChange}
+      />
       <ThemeProvider theme={theme}>
         <DataGrid
-          rows={products}
+          rows={filteredProducts}
           columns={columns}
           getRowId={(row) => row?.productId}
           className="bg-white shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
