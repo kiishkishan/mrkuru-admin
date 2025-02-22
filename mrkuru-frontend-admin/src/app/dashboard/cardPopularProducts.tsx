@@ -29,7 +29,7 @@ const CardPopularProducts = () => {
               >
                 {/* LEFT SIDE */}
                 <div className="flex items-center gap-3">
-                  <div className="relative mb-4 rounded-xl w-36 h-36 bg-gray-100 overflow-hidden aspect-square">
+                  <div className="relative mb-4 rounded-xl w-24 h-24 bg-gray-100 overflow-hidden aspect-square">
                     <Image
                       src={product?.imageUrl}
                       alt={product?.name}
