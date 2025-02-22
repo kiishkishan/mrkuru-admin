@@ -46,14 +46,6 @@ model Agents {
   Sales        Sales[]
 }
 
-model Suppliers {
-  supplierId      String      @id
-  supplierName    String
-  supplierContact String
-  supplierAddress String
-  Purchases       Purchases[]
-}
-
 model Sales {
   saleId          String        @id
   agentId         String? // Updated to make agentId nullable
@@ -83,6 +75,14 @@ model SalesSummary {
   date             DateTime
 }
 
+model Suppliers {
+  supplierId      String      @id
+  supplierName    String
+  supplierContact String
+  supplierAddress String
+  Purchases       Purchases[]
+}
+
 model PurchaseStatus {
   purchaseStatusId String      @id
   status           String
@@ -95,6 +95,7 @@ model Purchases {
   purchaseStatusId String
   timeStamp        DateTime
   subTotal         Float
+  amountPaid       Float
   PurchaseStatus   PurchaseStatus    @relation(fields: [purchaseStatusId], references: [purchaseStatusId])
   Suppliers        Suppliers         @relation(fields: [supplierId], references: [supplierId])
   PurchaseDetails  PurchaseDetails[]

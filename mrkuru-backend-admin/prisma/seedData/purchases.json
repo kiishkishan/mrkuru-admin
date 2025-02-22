@@ -4,6 +4,7 @@
     "supplierId": "bb684b5a-3dc8-4dd2-918e-145ab78c4bfa",
     "purchaseStatusId": "17917ee3-23d8-4437-b00d-615fc82a0267",
     "timeStamp": "2025-01-16T12:00:00Z",
-    "subTotal": 100000.00
-}
+    "subTotal": 100000.0,
+    "amountPaid": 50000.0
+  }
 ]
