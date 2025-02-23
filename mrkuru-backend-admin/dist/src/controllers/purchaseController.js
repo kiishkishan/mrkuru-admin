@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllPurchases = exports.getPurchaseStatus = exports.getSuppliers = void 0;
+exports.getAllPurchases = exports.createPurchaseStatus = exports.getPurchaseStatus = exports.createSuppliers = exports.getSuppliers = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -41,6 +41,29 @@ const getSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function* (
     }
 });
 exports.getSuppliers = getSuppliers;
+const createSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { supplierId, supplierName, supplierContact, supplierAddress } = req.body;
+        if (!supplierId || !supplierName || !supplierContact || !supplierAddress) {
+            res.status(400).json({ error: "Missing required fields" });
+            return;
+        }
+        const newSupplier = yield prisma.suppliers.create({
+            data: {
+                supplierId,
+                supplierName,
+                supplierContact,
+                supplierAddress,
+            },
+        });
+        res.status(201).json(newSupplier);
+    }
+    catch (error) {
+        console.error("Error creating supplier:", error);
+        res.status(500).json({ message: "Error creating supplier" });
+    }
+});
+exports.createSuppliers = createSuppliers;
 const getPurchaseStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -68,6 +91,27 @@ const getPurchaseStatus = (req, res) => __awaiter(void 0, void 0, void 0, functi
     }
 });
 exports.getPurchaseStatus = getPurchaseStatus;
+const createPurchaseStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { purchaseStatusId, status } = req.body;
+        if (!purchaseStatusId || !status) {
+            res.status(400).json({ error: "Missing required field: status" });
+            return;
+        }
+        const newPurchaseStatus = yield prisma.purchaseStatus.create({
+            data: {
+                purchaseStatusId,
+                status,
+            },
+        });
+        res.status(201).json(newPurchaseStatus);
+    }
+    catch (error) {
+        console.error("Error creating purchase status:", error);
+        res.status(500).json({ message: "Error creating purchase status" });
+    }
+});
+exports.createPurchaseStatus = createPurchaseStatus;
 const getAllPurchases = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const purchases = yield prisma.purchases.findMany({
