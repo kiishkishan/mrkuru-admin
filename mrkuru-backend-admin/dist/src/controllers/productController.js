@@ -112,7 +112,7 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     }
     catch (error) {
         console.error("Error processing product:", error);
-        next(error); // Pass the error to Express error handler
+        next(error);
     }
 });
 exports.createProduct = createProduct;
