@@ -30,6 +30,31 @@ export const getSuppliers = async (req: Request, res: Response) => {
   }
 };
 
+export const createSuppliers = async (req: Request, res: Response) => {
+  try {
+    const { supplierId, supplierName, supplierContact, supplierAddress } =
+      req.body;
+
+    if (!supplierId || !supplierName || !supplierContact || !supplierAddress) {
+      res.status(400).json({ error: "Missing required fields" });
+      return;
+    }
+
+    const newSupplier = await prisma.suppliers.create({
+      data: {
+        supplierId,
+        supplierName,
+        supplierContact,
+        supplierAddress,
+      },
+    });
+    res.status(201).json(newSupplier);
+  } catch (error) {
+    console.error("Error creating supplier:", error);
+    res.status(500).json({ message: "Error creating supplier" });
+  }
+};
+
 export const getPurchaseStatus = async (req: Request, res: Response) => {
   try {
     const search = req.query.search?.toString();
@@ -52,6 +77,28 @@ export const getPurchaseStatus = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error retrieving purchaseStatuses:", error);
     res.status(500).json({ message: "Error retrieving purchaseStatuses" });
+  }
+};
+
+export const createPurchaseStatus = async (req: Request, res: Response) => {
+  try {
+    const { purchaseStatusId, status } = req.body;
+
+    if (purchaseStatusId || !status) {
+      res.status(400).json({ error: "Missing required field: status" });
+      return;
+    }
+
+    const newPurchaseStatus = await prisma.purchaseStatus.create({
+      data: {
+        purchaseStatusId,
+        status,
+      },
+    });
+    res.status(201).json(newPurchaseStatus);
+  } catch (error) {
+    console.error("Error creating purchase status:", error);
+    res.status(500).json({ message: "Error creating purchase status" });
   }
 };
 
