@@ -122,7 +122,7 @@ export const createProduct = async (
     });
   } catch (error) {
     console.error("Error processing product:", error);
-    next(error); // Pass the error to Express error handler
+    next(error);
   }
 };
 
