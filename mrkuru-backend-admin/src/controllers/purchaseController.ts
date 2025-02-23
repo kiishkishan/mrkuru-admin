@@ -84,7 +84,7 @@ export const createPurchaseStatus = async (req: Request, res: Response) => {
   try {
     const { purchaseStatusId, status } = req.body;
 
-    if (purchaseStatusId || !status) {
+    if (!purchaseStatusId || !status) {
       res.status(400).json({ error: "Missing required field: status" });
       return;
     }

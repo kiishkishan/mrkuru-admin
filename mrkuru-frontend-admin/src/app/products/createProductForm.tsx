@@ -91,7 +91,7 @@ const CreateProductForm = ({ onCreate }: CreateProductFormProps) => {
   };
 
   return (
-    <div className="mb-8 p-4 border rounded-lg shadow-md bg-white">
+    <div className="mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
       {/* Simple Subheading */}
       <h2 className="text-lg font-semibold mb-3 text-gray-900">
         Add a New Product
