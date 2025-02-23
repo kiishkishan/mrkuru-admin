@@ -20,7 +20,7 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import Modal from "@/app/(components)/Modal";
 import { showToast } from "@/state/thunks/alertThunk";
 import useGetProducts from "@/app/(hooks)/getProducts";
-import StatusFilter from "../(components)/StatusFilter";
+import StatusFilter from "@/app/(components)/StatusFilter";
 
 interface ProductID {
   productId: string;
@@ -293,7 +293,7 @@ const Inventory = () => {
             <div className="flex items-center justify-center gap-2 w-full h-full">
               {/* Hold Selling Button */}
               <button
-                className="px-3 py-2 bg-gray-50 hover:bg-gray-200 font-semibold rounded-md text-sm shadow"
+                className="px-3 py-2 bg-gray-50 hover:bg-gray-200 font-semibold rounded-md text-sm shadow transition duration-200"
                 onClick={() =>
                   handleHoldSelling({
                     productId: params?.row?.productId,
@@ -307,7 +307,7 @@ const Inventory = () => {
 
               {/* Delete Button */}
               <Trash2
-                className="w-9 h-9 p-2 bg-gray-50 hover:bg-red-100 text-red-600 rounded-md shadow"
+                className="w-9 h-9 p-2 bg-gray-50 hover:bg-red-100 text-red-600 rounded-md shadow transition duration-200"
                 onClick={() => handleOpenModal(params?.row?.productId)}
               />
             </div>

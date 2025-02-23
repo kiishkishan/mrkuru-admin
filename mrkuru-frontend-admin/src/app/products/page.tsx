@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusCircleIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/(components)/Header";
 import CreateProductForm from "@/app/products/createProductForm";
@@ -8,6 +8,7 @@ import ProductCard from "@/app/products/productCard";
 import useGetProducts from "@/app/(hooks)/getProducts";
 import ProductCardSkeleton from "@/app/(components)/Skeleton/productCardSkeleton";
 import { useCreateProductMutation } from "@/state/api";
+import CreateButton from "@/app/(components)/Button/createButton";
 
 type ProductFormData = {
   name: string;
@@ -81,13 +82,7 @@ const Products = () => {
       {/* HEADER BAR */}
       <div className="flex justify-between items-center mb-6">
         <Header name="Products" />
-        <button
-          className="flex items-center bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
-          onClick={toggleCreateArea}
-        >
-          <PlusCircleIcon className="w-5 h-6 mr-2" />
-          Create Product
-        </button>
+        <CreateButton name="Create Product" onClickCreate={toggleCreateArea} />
       </div>
 
       {/* CREATE PRODUCT AREA */}
