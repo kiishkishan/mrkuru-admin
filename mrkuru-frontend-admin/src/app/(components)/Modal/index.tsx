@@ -17,7 +17,7 @@ const Modal: React.FC<ModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white rounded-lg shadow-lg w-1/3 p-5">
+      <div className="bg-white rounded-lg shadow-lg w-fit max-w-md p-5 mx-4">
         <div className="text-right">
           <button
             className="text-gray-500 hover:text-gray-700"
