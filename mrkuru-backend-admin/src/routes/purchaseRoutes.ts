@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.get("/suppliers", getSuppliers);
-router.get("/suppliers", createSuppliers);
+router.post("/suppliers", createSuppliers);
 router.get("/purchaseStatus", getPurchaseStatus);
 router.post("/purchaseStatus", createPurchaseStatus);
 router.get("/", getAllPurchases);

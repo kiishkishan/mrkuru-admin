@@ -184,6 +184,12 @@ const PurchasesDataGrid = () => {
           columns={columns}
           getRowId={(row) => row?.purchaseId}
           className="bg-white w-full shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 5 },
+            },
+          }}
+          pageSizeOptions={[5, 10, 15, 20]}
         />
       </ThemeProvider>
       <p className="px-2 py-1.5 font-semibold text-gray-600 text-sm text-right">

@@ -363,6 +363,12 @@ const Inventory = () => {
           columns={columns}
           getRowId={(row) => row?.productId}
           className="bg-white shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 5 },
+            },
+          }}
+          pageSizeOptions={[5, 10, 15, 20]}
         />
       </ThemeProvider>
       {isModalOpen && (
