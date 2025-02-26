@@ -1,14 +1,29 @@
-import React from "react";
-import { useGetSuppliersQuery } from "@/state/api";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useState } from "react";
+import { useCreateSupplierMutation, useGetSuppliersQuery } from "@/state/api";
 import { useAppSelector } from "@/app/redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { Edit3, Trash2 } from "lucide-react";
 import CreateButton from "@/app/(components)/Button/createButton";
+import CreateSupplierForm from "./createSupplierForm";
+
+interface SupplierForm {
+  supplierName: string;
+  supplierContact: string;
+  supplierAddress: string;
+}
 
 const SuppliersDataGrid = () => {
-  const { data: suppliers, isLoading, isError } = useGetSuppliersQuery();
+  const [isCreateAreaOpen, setIsCreateAreaOpen] = useState(false);
+  const {
+    data: suppliers,
+    isLoading,
+    isError,
+    refetch,
+  } = useGetSuppliersQuery();
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const [createSupplier] = useCreateSupplierMutation();
 
   const columns: GridColDef[] = [
     {
@@ -27,6 +42,12 @@ const SuppliersDataGrid = () => {
       field: "supplierContact",
       headerName: "Supplier Contact",
       renderHeader: () => <p className="font-bold">Supplier Contact</p>,
+      width: 200,
+    },
+    {
+      field: "supplierAddress",
+      headerName: "Supplier Address",
+      renderHeader: () => <p className="font-bold">Supplier Address</p>,
       width: 200,
     },
     // actions column
@@ -62,6 +83,20 @@ const SuppliersDataGrid = () => {
     },
   });
 
+  const toggleCreateSupplier = () => setIsCreateAreaOpen((prev) => !prev);
+
+  const handleCreateSupplier = async (supplierData: SupplierForm) => {
+    try {
+      await createSupplier(supplierData);
+      console.log("Supplier created:", supplierData);
+    } catch (error) {
+      console.error("Failed to create supplier:", error);
+    }
+    setIsCreateAreaOpen(false);
+    // fetch suppliers again
+    // TODO
+  };
+
   if (isLoading) {
     return <div className="py-4 animate-pulse">Loading...</div>;
   }
@@ -78,14 +113,26 @@ const SuppliersDataGrid = () => {
       <p className="text-base font-semibold text-gray-700">List of Suppliers</p>
       <>
         <div className="flex justify-start mb-4 mt-5">
-          <CreateButton name="Create Supplier" />
+          <CreateButton
+            name="Create Supplier"
+            onClickCreate={toggleCreateSupplier}
+          />
         </div>
+        {isCreateAreaOpen && (
+          <CreateSupplierForm onCreate={handleCreateSupplier} />
+        )}
         <ThemeProvider theme={theme}>
           <DataGrid
             rows={suppliers}
             columns={columns}
             getRowId={(row) => row?.supplierId}
-            className="bg-white w-full lg:w-fit shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
+            className={`bg-white w-full xl:w-fit overflow-x-hidden shadow rounded-lg border border-gray-200 mt-5 !text-gray-700`}
+            initialState={{
+              pagination: {
+                paginationModel: { pageSize: 5 },
+              },
+            }}
+            pageSizeOptions={[3, 5, 10]}
           />
         </ThemeProvider>
       </>

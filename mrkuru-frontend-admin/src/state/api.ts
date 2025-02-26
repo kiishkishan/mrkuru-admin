@@ -56,6 +56,13 @@ export interface Suppliers {
   supplierAddress: string;
 }
 
+export interface NewSuppliers {
+  supplierId?: string;
+  supplierName: string;
+  supplierContact: string;
+  supplierAddress: string;
+}
+
 export interface PurchaseStatus {
   purchaseStatusId: string;
   status: string;
@@ -215,6 +222,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Purchases"],
     }),
+    createSupplier: build.mutation<Suppliers, NewSuppliers>({
+      query: (newSuppliers: NewSuppliers) => ({
+        url: "purchases/suppliers",
+        method: "POST",
+        body: newSuppliers,
+      }),
+      invalidatesTags: ["Purchases"],
+    }),
   }),
 });
 
@@ -230,4 +245,5 @@ export const {
   useGetPurchaseStatusQuery,
   useGetPurchasesQuery,
   useCreatePurchaseStatusMutation,
+  useCreateSupplierMutation,
 } = api;

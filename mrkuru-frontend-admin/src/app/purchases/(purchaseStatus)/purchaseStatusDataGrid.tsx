@@ -84,15 +84,15 @@ const PurchaseStatusDataGrid = () => {
     try {
       console.log("purchaseStatusData", purchaseStatusData);
       await createPurchaseStatus(purchaseStatusData);
-      setTimeout(() => {
-        refetch();
-      }, 1000);
       setIsCreateAreaOpen(false);
       // Optionally, you can add success handling here
     } catch (error) {
       console.error("Failed to create product", error);
       // Optionally, you can add error handling here
     }
+    setTimeout(() => {
+      refetch();
+    }, 1000);
   };
 
   if (isLoading) {
@@ -123,12 +123,20 @@ const PurchaseStatusDataGrid = () => {
           <CreatePurchaseStatusForm onCreate={handleCreatePurchaseStatus} />
         )}
         <ThemeProvider theme={theme}>
-          <DataGrid
-            rows={purchaseStatus}
-            columns={columns}
-            getRowId={(row) => row?.purchaseStatusId}
-            className="bg-white w-full xs:w-fit shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
-          />
+          <div className="w-full overflow-auto">
+            <DataGrid
+              rows={purchaseStatus}
+              columns={columns}
+              getRowId={(row) => row?.purchaseStatusId}
+              initialState={{
+                pagination: {
+                  paginationModel: { pageSize: 5 },
+                },
+              }}
+              pageSizeOptions={[3, 5, 10]}
+              className={`bg-white w-full lg:w-fit overflow-x-hidden shadow rounded-lg border border-gray-200 mt-5 !text-gray-700`}
+            />
+          </div>
         </ThemeProvider>
       </>
     </div>

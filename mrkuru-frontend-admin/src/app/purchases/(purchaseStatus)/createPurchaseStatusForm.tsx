@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from "uuid";
 import { X } from "lucide-react";
 
 const schema = yup.object().shape({
-  status: yup.string().required("Status name is required"),
+  status: yup.string().required("Status is required"),
 });
 
 type PurchaseStatusForm = yup.InferType<typeof schema> & {

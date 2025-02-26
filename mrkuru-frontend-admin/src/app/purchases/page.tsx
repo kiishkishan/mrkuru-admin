@@ -25,9 +25,9 @@ const Purchases = () => {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`py-2 px-6 text-sm font-medium transition-all duration-300 ${
+            className={`py-2 px-6 text-sm font-medium transition-all duration-200 ease-in-out transform ${
               activeTab === tab.id
-                ? " bg-gray-50 text-gray-900 shadow-md"
+                ? "bg-gray-50 text-gray-900 shadow-md scale-105"
                 : "bg-gray-100 hover:bg-gray-200 text-gray-700"
             }`}
           >
