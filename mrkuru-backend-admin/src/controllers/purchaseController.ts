@@ -35,6 +35,8 @@ export const createSuppliers = async (req: Request, res: Response) => {
     const { supplierId, supplierName, supplierContact, supplierAddress } =
       req.body;
 
+    console.log("createSuppliers", req.body);
+
     if (!supplierId || !supplierName || !supplierContact || !supplierAddress) {
       res.status(400).json({ error: "Missing required fields" });
       return;

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import { useCreateSupplierMutation, useGetSuppliersQuery } from "@/state/api";
 import { useAppSelector } from "@/app/redux";
@@ -93,8 +92,7 @@ const SuppliersDataGrid = () => {
       console.error("Failed to create supplier:", error);
     }
     setIsCreateAreaOpen(false);
-    // fetch suppliers again
-    // TODO
+    refetch();
   };
 
   if (isLoading) {

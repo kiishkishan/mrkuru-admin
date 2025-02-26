@@ -6,17 +6,26 @@ import { v4 as uuidv4 } from "uuid";
 import { X } from "lucide-react";
 
 const schema = yup.object().shape({
-  supplierName: yup.string().required("Supplier Name is required"),
+  supplierName: yup
+    .string()
+    .required("Supplier Name is required")
+    .min(5, "Supplier Name should have 5 characters minimum"),
   supplierContact: yup
     .string()
     .required("Supplier Contact is required")
-    .matches(/^[0-9]+$/, "Supplier Contact must only contain numbers")
+    .matches(
+      /^0[0-9]+$/,
+      "Supplier Contact must start with 0 and only contain numbers"
+    )
     .length(10, "Supplier Contact must be exactly 10 digits"),
-  supplierAddress: yup.string().required("Supplier Address is required"),
+  supplierAddress: yup
+    .string()
+    .required("Supplier Address is required")
+    .min(10, "Supplier Address should have 5 characters minimum"),
 });
 
 type PurchaseStatusForm = yup.InferType<typeof schema> & {
-  purchaseStatusId?: string;
+  supplierId?: string;
 };
 
 type CreateSupplierFormProps = {
@@ -38,7 +47,7 @@ const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
     onCreate({
       ...data,
       supplierContact: `+94${data.supplierContact}`,
-      purchaseStatusId: uuidv4(),
+      supplierId: uuidv4(),
     });
     reset();
   };

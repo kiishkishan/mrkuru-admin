@@ -44,6 +44,7 @@ exports.getSuppliers = getSuppliers;
 const createSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { supplierId, supplierName, supplierContact, supplierAddress } = req.body;
+        console.log("createSuppliers", req.body);
         if (!supplierId || !supplierName || !supplierContact || !supplierAddress) {
             res.status(400).json({ error: "Missing required fields" });
             return;

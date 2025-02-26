@@ -4,7 +4,7 @@ const express_1 = require("express");
 const purchaseController_1 = require("../controllers/purchaseController");
 const router = (0, express_1.Router)();
 router.get("/suppliers", purchaseController_1.getSuppliers);
-router.get("/suppliers", purchaseController_1.createSuppliers);
+router.post("/suppliers", purchaseController_1.createSuppliers);
 router.get("/purchaseStatus", purchaseController_1.getPurchaseStatus);
 router.post("/purchaseStatus", purchaseController_1.createPurchaseStatus);
 router.get("/", purchaseController_1.getAllPurchases);
