@@ -70,8 +70,6 @@ const Inventory = () => {
         dispatch(
           showToast("Product hold status updated successfully!", "success")
         );
-
-        // Refetch products after updating hold status
         refetchProducts();
       } catch (error) {
         console.error("Failed to hold selling product:", error);
@@ -102,11 +100,8 @@ const Inventory = () => {
   const handleConfirmDelete = async () => {
     if (selectedProduct) {
       try {
-        await deleteProduct(selectedProduct);
+        await deleteProduct(selectedProduct).unwrap();
         setIsModalOpen(false);
-
-        // Debug: Log to confirm the thunk is being called
-        console.log("Product deleted successfully. Dispatching toast...");
 
         // Show a success toast
         dispatch(showToast("Product deleted successfully!", "success"));

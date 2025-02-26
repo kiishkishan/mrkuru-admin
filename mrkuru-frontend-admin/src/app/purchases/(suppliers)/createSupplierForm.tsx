@@ -53,7 +53,7 @@ const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
   };
 
   return (
-    <div className="w-full lg:w-1/2 xl:h-1/3 mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
+    <div className="w-full lg:w-3/5 xl:w-4/7 mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
       {/* Simple Subheading */}
       <h2 className="text-lg font-semibold mb-3 text-gray-900">
         Add a New Purchase Status

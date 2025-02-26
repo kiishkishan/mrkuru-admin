@@ -230,6 +230,22 @@ export const api = createApi({
       }),
       invalidatesTags: ["Purchases"],
     }),
+    deleteSupplier: build.mutation<{ success: boolean }, string | void>({
+      query: (supplierId) => ({
+        url: `purchases/suppliers`,
+        method: "DELETE",
+        body: { supplierId },
+      }),
+      invalidatesTags: ["Purchases"],
+    }),
+    deletePurchaseStatus: build.mutation<{ success: boolean }, string | void>({
+      query: (purchaseStatusId) => ({
+        url: `purchases/purchaseStatus`,
+        method: "DELETE",
+        body: { purchaseStatusId },
+      }),
+      invalidatesTags: ["Purchases"],
+    }),
   }),
 });
 
@@ -246,4 +262,6 @@ export const {
   useGetPurchasesQuery,
   useCreatePurchaseStatusMutation,
   useCreateSupplierMutation,
+  useDeleteSupplierMutation,
+  useDeletePurchaseStatusMutation,
 } = api;
