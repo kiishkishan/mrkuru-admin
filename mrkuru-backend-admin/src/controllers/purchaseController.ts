@@ -208,6 +208,8 @@ export const getAllPurchases = async (req: Request, res: Response) => {
           select: {
             supplierId: true,
             supplierName: true,
+            supplierAddress: true,
+            supplierContact: true,
           },
         },
         PurchaseStatus: {
@@ -220,6 +222,7 @@ export const getAllPurchases = async (req: Request, res: Response) => {
           select: {
             purchaseDetailsId: true,
             unitPrice: true,
+            quantity: true,
             totalPrice: true,
             Products: {
               select: {

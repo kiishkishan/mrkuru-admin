@@ -205,6 +205,8 @@ const getAllPurchases = (req, res) => __awaiter(void 0, void 0, void 0, function
                     select: {
                         supplierId: true,
                         supplierName: true,
+                        supplierAddress: true,
+                        supplierContact: true,
                     },
                 },
                 PurchaseStatus: {
@@ -217,6 +219,7 @@ const getAllPurchases = (req, res) => __awaiter(void 0, void 0, void 0, function
                     select: {
                         purchaseDetailsId: true,
                         unitPrice: true,
+                        quantity: true,
                         totalPrice: true,
                         Products: {
                             select: {

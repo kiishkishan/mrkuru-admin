@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Header from "@/app/(components)/Header";
-import PurchasesDataGrid from "@/app/purchases/purchasesDataGrid";
+import PurchasesDataGrid from "@/app/purchases/(purchases)/purchasesDataGrid";
 import SuppliersDataGrid from "@/app/purchases/(suppliers)/supplierDataGrid";
 import PurchaseStatusDataGrid from "@/app/purchases/(purchaseStatus)/purchaseStatusDataGrid";
 import SubHeadingSkeleton from "../(components)/Skeleton/subHeadingSkeleton";
@@ -20,7 +20,7 @@ const Purchases = () => {
     setIsLoading(true);
     setTimeout(() => {
       setIsLoading(false);
-    }, 2000);
+    }, 1500);
   }, []);
 
   return (
