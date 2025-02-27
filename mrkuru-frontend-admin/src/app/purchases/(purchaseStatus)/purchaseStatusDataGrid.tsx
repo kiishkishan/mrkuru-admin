@@ -13,6 +13,8 @@ import CreatePurchaseStatusForm from "@/app/purchases/(purchaseStatus)/createPur
 import { showToast } from "@/state/thunks/alertThunk";
 import { useAppDispatch } from "@/app/redux";
 import Modal from "@/app/(components)/Modal";
+import DataGridSkeleton from "@/app/(components)/Skeleton/dataGridSkeleton";
+import SubHeadingSkeleton from "@/app/(components)/Skeleton/subHeadingSkeleton";
 
 interface PurchaseStatusForm {
   purchaseStatusId?: string;
@@ -146,7 +148,13 @@ const PurchaseStatusDataGrid = () => {
   };
 
   if (isLoading) {
-    return <div className="py-4 animate-pulse">Loading...</div>;
+    return (
+      <div className="flex flex-col mt-5 gap-4">
+        <SubHeadingSkeleton style="w-1/4 h-6" />
+        <SubHeadingSkeleton style="w-2/5 h-8 " />
+        <DataGridSkeleton rows={2} style="w-full lg:w-fit overflow-x-hidden" />
+      </div>
+    );
   }
 
   if (isError && !isLoading && !purchaseStatus) {

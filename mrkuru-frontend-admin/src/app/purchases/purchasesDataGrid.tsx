@@ -6,6 +6,8 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import { format } from "date-fns";
 import { Download, Edit3, Trash2 } from "lucide-react";
 import CreateButton from "../(components)/Button/createButton";
+import SubHeadingSkeleton from "../(components)/Skeleton/subHeadingSkeleton";
+import DataGridSkeleton from "../(components)/Skeleton/dataGridSkeleton";
 
 const PurchasesDataGrid = () => {
   const { data: purchases, isLoading, isError } = useGetPurchasesQuery();
@@ -160,7 +162,15 @@ const PurchasesDataGrid = () => {
   });
 
   if (isLoading) {
-    return <div className="py-4 animate-pulse">Loading...</div>;
+    if (isLoading) {
+      return (
+        <div className="flex flex-col mt-5 gap-4">
+          <SubHeadingSkeleton style="w-1/4 h-6" />
+          <SubHeadingSkeleton style="w-2/5 h-8 justify-end " />
+          <DataGridSkeleton rows={2} style="w-full overflow-x-hidden" />
+        </div>
+      );
+    }
   }
 
   if (isError && !isLoading && !purchases) {

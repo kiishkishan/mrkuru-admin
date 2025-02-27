@@ -2,11 +2,12 @@ import React from "react";
 
 type DataGridSkeletonProps = {
   rows: number;
+  style: string;
 };
 
-const DataGridSkeleton = ({ rows }: DataGridSkeletonProps) => {
+const DataGridSkeleton = ({ rows, style }: DataGridSkeletonProps) => {
   return (
-    <div className="w-full mt-5 space-y-2">
+    <div className={` ${style} mt-5 space-y-2`}>
       {/* Header Shimmer */}
       <div className="h-10 bg-gray-300 animate-pulse rounded-md"></div>
       {/* Rows Shimmer */}
