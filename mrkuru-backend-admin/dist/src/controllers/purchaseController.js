@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllPurchases = exports.createPurchaseStatus = exports.getPurchaseStatus = exports.createSuppliers = exports.getSuppliers = void 0;
+exports.getAllPurchases = exports.createPurchaseStatus = exports.getPurchaseStatus = exports.deletePurchaseStatus = exports.deleteSupplier = exports.createSuppliers = exports.getSuppliers = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -44,6 +44,7 @@ exports.getSuppliers = getSuppliers;
 const createSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { supplierId, supplierName, supplierContact, supplierAddress } = req.body;
+        console.log("createSuppliers", req.body);
         if (!supplierId || !supplierName || !supplierContact || !supplierAddress) {
             res.status(400).json({ error: "Missing required fields" });
             return;
@@ -64,6 +65,85 @@ const createSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.createSuppliers = createSuppliers;
+const deleteSupplier = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { supplierId } = req.body;
+        console.log("deleteSupplier supplierId", supplierId);
+        if (!supplierId) {
+            res.status(400).json({ error: "Missing required field: supplierId" });
+            return;
+        }
+        // Check if any purchase exists linked to this supplier
+        const existingPurchase = yield prisma.purchases.findFirst({
+            where: {
+                Suppliers: {
+                    supplierId: supplierId,
+                },
+            },
+        });
+        if (existingPurchase) {
+            res
+                .status(400)
+                .send("Cannot delete supplier. There are purchases linked to this supplier.");
+            return;
+        }
+        const deletedSupplier = yield prisma.suppliers.delete({
+            where: {
+                supplierId,
+            },
+        });
+        res.status(200).json(deletedSupplier);
+    }
+    catch (error) {
+        console.error("Error deleting supplier:", error);
+        res.status(500).json({
+            message: "Error deleting supplier",
+            error: error.message,
+        });
+    }
+});
+exports.deleteSupplier = deleteSupplier;
+const deletePurchaseStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { purchaseStatusId } = req.body;
+        console.log("deletePurchaseStatus purchaseStatusId", purchaseStatusId);
+        if (!purchaseStatusId) {
+            res
+                .status(400)
+                .json({ error: "Missing required field: purchaseStatusId" });
+            return;
+        }
+        // Check if any purchase exists linked to this Purchase Status
+        const existingPurchase = yield prisma.purchases.findFirst({
+            where: {
+                PurchaseStatus: {
+                    purchaseStatusId: purchaseStatusId,
+                },
+            },
+        });
+        console.log("existingPurchase", existingPurchase);
+        if (existingPurchase) {
+            res
+                .status(400)
+                .send("Cannot delete purchase status. There are purchases linked to this purchase status.");
+            return;
+        }
+        const deletedPurchaseStatus = yield prisma.purchaseStatus.delete({
+            where: {
+                purchaseStatusId,
+            },
+        });
+        res.status(200).json(deletedPurchaseStatus);
+    }
+    catch (error) {
+        console.error("Error deleting Purchase Status:", error);
+        res.status(500).json({
+            message: "Error deleting Purchase Status",
+            error: error.message,
+        });
+    }
+});
+exports.deletePurchaseStatus = deletePurchaseStatus;
 const getPurchaseStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
@@ -125,6 +205,8 @@ const getAllPurchases = (req, res) => __awaiter(void 0, void 0, void 0, function
                     select: {
                         supplierId: true,
                         supplierName: true,
+                        supplierAddress: true,
+                        supplierContact: true,
                     },
                 },
                 PurchaseStatus: {
@@ -137,6 +219,7 @@ const getAllPurchases = (req, res) => __awaiter(void 0, void 0, void 0, function
                     select: {
                         purchaseDetailsId: true,
                         unitPrice: true,
+                        quantity: true,
                         totalPrice: true,
                         Products: {
                             select: {

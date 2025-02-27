@@ -1,11 +1,47 @@
-import React from "react";
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React, { useState } from "react";
 import { useGetPurchasesQuery } from "@/state/api";
 import { useAppSelector } from "@/app/redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { format } from "date-fns";
-import { Download, Edit3, Trash2 } from "lucide-react";
-import CreateButton from "../(components)/Button/createButton";
+import { Download, Edit3, Trash2, X } from "lucide-react";
+import CreateButton from "@/app/(components)/Button/createButton";
+import SubHeadingSkeleton from "@/app/(components)/Skeleton/subHeadingSkeleton";
+import DataGridSkeleton from "@/app/(components)/Skeleton/dataGridSkeleton";
+import PurchaseOrderDocument from "@/app/purchases/(purchases)/purchaseOrderDocument";
+import { usePDF } from "@react-pdf/renderer";
+
+// type PurchaseProps = {
+//   purchaseId: string;
+//   timeStamp: string;
+//   Suppliers: {
+//     supplierId: string;
+//     supplierName: string;
+//     supplierAddress: string;
+//     supplierContact: string;
+//   };
+//   PurchaseStatus: {
+//     purchaseStatusId: string;
+//     status: string;
+//   };
+//   PurchaseDetails: PurchaseDetailProps[];
+//   subTotal: number;
+//   amountPaid: number;
+// };
+
+// type PurchaseDetailProps = {
+//   purchaseDetailsId: string;
+//   unitPrice: number;
+//   totalPrice: number;
+//   qty: number;
+//   Products: {
+//     productId: string;
+//     name: string;
+//     price: number;
+//     stockQuantity: number;
+//   };
+// };
 
 const PurchasesDataGrid = () => {
   const { data: purchases, isLoading, isError } = useGetPurchasesQuery();
@@ -16,13 +52,24 @@ const PurchasesDataGrid = () => {
     (state) => state.global.isSidebarCollapsed
   );
 
+  const [selectedPurchase, setSelectedPurchase] = useState<any>();
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal State
+
+  // PDF
+  const [instance, update] = usePDF({
+    document: <PurchaseOrderDocument purchases={selectedPurchase} />,
+  });
+
+  const openModal = (purchase: object) => {
+    setSelectedPurchase(purchase);
+    console.log("selectedPurchase", selectedPurchase);
+    update(<PurchaseOrderDocument purchases={selectedPurchase} />); // Update PDF rendering
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => setIsModalOpen(false);
+
   const columns: GridColDef[] = [
-    {
-      field: "purchaseId",
-      headerName: "Purchase ID",
-      width: isSidebarCollapsed ? 260 : 140,
-      renderHeader: () => <p className="font-bold">Purchase ID</p>,
-    },
     {
       field: "timeStamp",
       headerName: "Time Stamp",
@@ -40,14 +87,14 @@ const PurchasesDataGrid = () => {
       field: "supplier",
       headerName: "Supplier",
       renderHeader: () => <p className="font-bold">Supplier</p>,
-      width: 160,
+      width: 180,
       valueGetter: (value, row) => `${row?.Suppliers.supplierName}`,
     },
     {
       field: "purchaseStatus",
       headerName: "Status",
       renderHeader: () => <p className="font-bold">Status</p>,
-      width: 110,
+      width: 120,
       valueGetter: (value, row) => `${row?.PurchaseStatus?.status}`,
     },
     {
@@ -98,7 +145,7 @@ const PurchasesDataGrid = () => {
       renderHeader: () => <p className="font-bold">Export</p>,
       width: 150,
       align: "center",
-      renderCell: () => (
+      renderCell: (params) => (
         <div className="flex items-center justify-center self-center w-full h-full gap-2">
           {/* Export as CSV Button */}
           <button
@@ -106,7 +153,7 @@ const PurchasesDataGrid = () => {
               // Add CSV export logic here
               console.log("Export as CSV");
             }}
-            className="flex items-center justify-center px-3 py-2 bg-white hover:bg-gray-400 text-gray-600 hover:text-gray-900 font-semibold rounded-md text-sm shadow transition duration-200"
+            className="flex items-center justify-center px-3 py-2 bg-white hover:bg-gray-400 text-gray-600 hover:text-gray-900 font-semibold rounded-md text-sm shadow-md transition duration-200"
           >
             CSV
             <Download className="ml-2 w-4 h-4" />
@@ -114,11 +161,8 @@ const PurchasesDataGrid = () => {
 
           {/* Export as PDF Button */}
           <button
-            onClick={() => {
-              // Add PDF export logic here
-              console.log("Export as PDF");
-            }}
-            className="flex items-center justify-center px-3 py-2 bg-white hover:bg-gray-400 text-gray-600 hover:text-gray-900 font-semibold rounded-md text-sm shadow transition duration-200"
+            onClick={() => openModal(params.row)}
+            className="flex items-center justify-center px-3 py-2 bg-white hover:bg-gray-400 text-gray-600 hover:text-gray-900 font-semibold rounded-md text-sm shadow-md transition duration-200"
           >
             PDF
             <Download className="ml-2 w-4 h-4" />
@@ -130,7 +174,7 @@ const PurchasesDataGrid = () => {
     {
       field: "actions",
       headerName: "Actions",
-      width: 150,
+      width: 250,
       align: "center",
       headerAlign: "center",
       sortable: false,
@@ -141,9 +185,13 @@ const PurchasesDataGrid = () => {
       ),
       renderCell: () => {
         return (
-          <div className="flex items-center justify-center gap-2 w-full h-full">
-            <Edit3 className="w-9 h-9 p-2 bg-white hover:bg-blue-200 text-gray-600 hover:text-gray-900 rounded-md shadow transition duration-200" />
-            <Trash2 className="w-9 h-9 p-2 bg-gray-50 hover:bg-red-100 text-red-600 rounded-md shadow transition duration-200" />
+          <div className="flex items-center justify-center gap-3 w-full h-full">
+            {/* Hold Selling Button */}
+            <button className="px-3 py-2 bg-white hover:bg-gray-200 font-semibold rounded-md text-sm shadow-md transition duration-200">
+              Change Status
+            </button>
+            <Edit3 className="w-9 h-9 p-2 bg-white hover:bg-blue-200 text-gray-600 hover:text-gray-900 rounded-md shadow-md transition duration-200" />
+            <Trash2 className="w-9 h-9 p-2 bg-white hover:bg-red-100 text-red-600 rounded-md shadow-md transition duration-200 " />
           </div>
         );
       },
@@ -160,7 +208,15 @@ const PurchasesDataGrid = () => {
   });
 
   if (isLoading) {
-    return <div className="py-4 animate-pulse">Loading...</div>;
+    if (isLoading) {
+      return (
+        <div className="flex flex-col mt-5 gap-4">
+          <SubHeadingSkeleton style="w-1/4 h-6" />
+          <SubHeadingSkeleton style="w-2/5 h-8 justify-end " />
+          <DataGridSkeleton rows={2} style="w-full overflow-x-hidden" />
+        </div>
+      );
+    }
   }
 
   if (isError && !isLoading && !purchases) {
@@ -195,6 +251,48 @@ const PurchasesDataGrid = () => {
       <p className="px-2 py-1.5 font-semibold text-gray-600 text-sm text-right">
         ** TPP = Total Products Purchased
       </p>
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 p-5 rounded-lg shadow-lg relative">
+            {/* Close Button */}
+            <button
+              onClick={closeModal}
+              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
+            >
+              <X className="w-6 h-6" />
+            </button>
+
+            {/* Modal Header */}
+            <h2 className="text-lg font-semibold text-gray-700 mb-4">
+              Purchase Order Preview
+            </h2>
+
+            {/* PDF Preview */}
+            {instance.url ? (
+              <iframe
+                src={instance.url}
+                className="w-full h-96 border rounded-lg"
+              ></iframe>
+            ) : (
+              <p className="text-center text-gray-500">
+                Generating PDF preview...
+              </p>
+            )}
+
+            {/* Download PDF */}
+            <div className="mt-4 flex justify-end">
+              <a
+                href={instance.url || ""}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+              >
+                Download PDF
+              </a>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

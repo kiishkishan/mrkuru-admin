@@ -35,6 +35,8 @@ export const createSuppliers = async (req: Request, res: Response) => {
     const { supplierId, supplierName, supplierContact, supplierAddress } =
       req.body;
 
+    console.log("createSuppliers", req.body);
+
     if (!supplierId || !supplierName || !supplierContact || !supplierAddress) {
       res.status(400).json({ error: "Missing required fields" });
       return;
@@ -52,6 +54,97 @@ export const createSuppliers = async (req: Request, res: Response) => {
   } catch (error) {
     console.error("Error creating supplier:", error);
     res.status(500).json({ message: "Error creating supplier" });
+  }
+};
+
+export const deleteSupplier = async (req: Request, res: Response) => {
+  try {
+    const { supplierId } = req.body;
+
+    console.log("deleteSupplier supplierId", supplierId);
+
+    if (!supplierId) {
+      res.status(400).json({ error: "Missing required field: supplierId" });
+      return;
+    }
+
+    // Check if any purchase exists linked to this supplier
+    const existingPurchase = await prisma.purchases.findFirst({
+      where: {
+        Suppliers: {
+          supplierId: supplierId,
+        },
+      },
+    });
+
+    if (existingPurchase) {
+      res
+        .status(400)
+        .send(
+          "Cannot delete supplier. There are purchases linked to this supplier."
+        );
+      return;
+    }
+
+    const deletedSupplier = await prisma.suppliers.delete({
+      where: {
+        supplierId,
+      },
+    });
+    res.status(200).json(deletedSupplier);
+  } catch (error: any) {
+    console.error("Error deleting supplier:", error);
+    res.status(500).json({
+      message: "Error deleting supplier",
+      error: error.message,
+    });
+  }
+};
+
+export const deletePurchaseStatus = async (req: Request, res: Response) => {
+  try {
+    const { purchaseStatusId } = req.body;
+
+    console.log("deletePurchaseStatus purchaseStatusId", purchaseStatusId);
+
+    if (!purchaseStatusId) {
+      res
+        .status(400)
+        .json({ error: "Missing required field: purchaseStatusId" });
+      return;
+    }
+
+    // Check if any purchase exists linked to this Purchase Status
+    const existingPurchase = await prisma.purchases.findFirst({
+      where: {
+        PurchaseStatus: {
+          purchaseStatusId: purchaseStatusId,
+        },
+      },
+    });
+    console.log("existingPurchase", existingPurchase);
+
+    if (existingPurchase) {
+      res
+        .status(400)
+        .send(
+          "Cannot delete purchase status. There are purchases linked to this purchase status."
+        );
+      return;
+    }
+
+    const deletedPurchaseStatus = await prisma.purchaseStatus.delete({
+      where: {
+        purchaseStatusId,
+      },
+    });
+    res.status(200).json(deletedPurchaseStatus);
+  } catch (error: any) {
+    console.error("Error deleting Purchase Status:", error);
+    res.status(500).json({
+      message: "Error deleting Purchase Status",
+      error: error.message,
+    });
   }
 };
 
@@ -115,6 +208,8 @@ export const getAllPurchases = async (req: Request, res: Response) => {
           select: {
             supplierId: true,
             supplierName: true,
+            supplierAddress: true,
+            supplierContact: true,
           },
         },
         PurchaseStatus: {
@@ -127,6 +222,7 @@ export const getAllPurchases = async (req: Request, res: Response) => {
           select: {
             purchaseDetailsId: true,
             unitPrice: true,
+            quantity: true,
             totalPrice: true,
             Products: {
               select: {

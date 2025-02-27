@@ -6,17 +6,26 @@ import { v4 as uuidv4 } from "uuid";
 import { X } from "lucide-react";
 
 const schema = yup.object().shape({
-  supplierName: yup.string().required("Supplier Name is required"),
+  supplierName: yup
+    .string()
+    .required("Supplier Name is required")
+    .min(5, "Supplier Name should have 5 characters minimum"),
   supplierContact: yup
     .string()
     .required("Supplier Contact is required")
-    .matches(/^[0-9]+$/, "Supplier Contact must only contain numbers")
+    .matches(
+      /^0[0-9]+$/,
+      "Supplier Contact must start with 0 and only contain numbers"
+    )
     .length(10, "Supplier Contact must be exactly 10 digits"),
-  supplierAddress: yup.string().required("Supplier Address is required"),
+  supplierAddress: yup
+    .string()
+    .required("Supplier Address is required")
+    .min(10, "Supplier Address should have 5 characters minimum"),
 });
 
 type PurchaseStatusForm = yup.InferType<typeof schema> & {
-  purchaseStatusId?: string;
+  supplierId?: string;
 };
 
 type CreateSupplierFormProps = {
@@ -38,13 +47,13 @@ const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
     onCreate({
       ...data,
       supplierContact: `+94${data.supplierContact}`,
-      purchaseStatusId: uuidv4(),
+      supplierId: uuidv4(),
     });
     reset();
   };
 
   return (
-    <div className="w-full lg:w-1/2 xl:h-1/3 mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
+    <div className="w-full lg:w-3/5 xl:w-4/7 mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
       {/* Simple Subheading */}
       <h2 className="text-lg font-semibold mb-3 text-gray-900">
         Add a New Purchase Status

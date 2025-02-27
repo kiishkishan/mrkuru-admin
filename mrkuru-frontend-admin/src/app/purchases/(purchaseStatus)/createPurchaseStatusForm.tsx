@@ -6,7 +6,10 @@ import { v4 as uuidv4 } from "uuid";
 import { X } from "lucide-react";
 
 const schema = yup.object().shape({
-  status: yup.string().required("Status is required"),
+  status: yup
+    .string()
+    .required("Status is required")
+    .min(5, "Status should have 5 characters minimum"),
 });
 
 type PurchaseStatusForm = yup.InferType<typeof schema> & {
@@ -36,7 +39,7 @@ const CreatePurchaseStatusForm = ({
   };
 
   return (
-    <div className="w-full md:w-fit mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
+    <div className="w-full md:w-2/3 lg:w-2/4 xl:w-2/5 mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
       {/* Simple Subheading */}
       <h2 className="text-lg font-semibold mb-3 text-gray-900">
         Add a New Purchase Status
@@ -45,10 +48,10 @@ const CreatePurchaseStatusForm = ({
       {/* Form */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-1 gap-6 sm:grid-cols-2"
+        className="grid grid-cols-4 grid-rows-2 gap-6"
       >
         {/* Product Name */}
-        <div>
+        <div className="col-span-3 sm:col-span-2 md:col-span-3 row-span-1">
           <label className="block text-sm font-medium text-gray-700 ">
             Purchase Status
           </label>
@@ -81,7 +84,7 @@ const CreatePurchaseStatusForm = ({
         </div>
 
         {/* Submit Button */}
-        <div className="sm:col-span-2 text-left">
+        <div className="row-start-2 col-span-3 md:col-span-2 text-left">
           <button
             type="submit"
             className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm"

@@ -9,6 +9,8 @@ import useGetProducts from "@/app/(hooks)/getProducts";
 import ProductCardSkeleton from "@/app/(components)/Skeleton/productCardSkeleton";
 import { useCreateProductMutation } from "@/state/api";
 import CreateButton from "@/app/(components)/Button/createButton";
+import { showToast } from "@/state/thunks/alertThunk";
+import { useAppDispatch } from "../redux";
 
 type ProductFormData = {
   name: string;
@@ -38,6 +40,9 @@ const Products = () => {
     useGetProducts(searchTerm);
 
   const [createProduct] = useCreateProductMutation();
+
+  const dispatch = useAppDispatch();
+
   const handleCreateProduct = async (productData: ProductFormData) => {
     try {
       console.log("Product Data", productData.image);
@@ -46,10 +51,13 @@ const Products = () => {
         refetchProducts();
       }, 1000);
       setIsCreateAreaOpen(false);
-      // Optionally, you can add success handling here
+      dispatch(showToast("Product created successfully!", "success"));
     } catch (error) {
       console.error("Failed to create product", error);
-      // Optionally, you can add error handling here
+      // Show an error toast
+      dispatch(
+        showToast("Failed to create product. Please try again.", "error")
+      );
     }
   };
 
