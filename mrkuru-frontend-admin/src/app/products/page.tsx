@@ -1,6 +1,6 @@
 "use client";
 
-import { PlusCircleIcon, SearchIcon } from "lucide-react";
+import { SearchIcon } from "lucide-react";
 import { useState } from "react";
 import Header from "@/app/(components)/Header";
 import CreateProductForm from "@/app/products/createProductForm";
@@ -8,6 +8,9 @@ import ProductCard from "@/app/products/productCard";
 import useGetProducts from "@/app/(hooks)/getProducts";
 import ProductCardSkeleton from "@/app/(components)/Skeleton/productCardSkeleton";
 import { useCreateProductMutation } from "@/state/api";
+import CreateButton from "@/app/(components)/Button/createButton";
+import { showToast } from "@/state/thunks/alertThunk";
+import { useAppDispatch } from "../redux";
 
 type ProductFormData = {
   name: string;
@@ -37,6 +40,9 @@ const Products = () => {
     useGetProducts(searchTerm);
 
   const [createProduct] = useCreateProductMutation();
+
+  const dispatch = useAppDispatch();
+
   const handleCreateProduct = async (productData: ProductFormData) => {
     try {
       console.log("Product Data", productData.image);
@@ -45,10 +51,13 @@ const Products = () => {
         refetchProducts();
       }, 1000);
       setIsCreateAreaOpen(false);
-      // Optionally, you can add success handling here
+      dispatch(showToast("Product created successfully!", "success"));
     } catch (error) {
       console.error("Failed to create product", error);
-      // Optionally, you can add error handling here
+      // Show an error toast
+      dispatch(
+        showToast("Failed to create product. Please try again.", "error")
+      );
     }
   };
 
@@ -81,13 +90,7 @@ const Products = () => {
       {/* HEADER BAR */}
       <div className="flex justify-between items-center mb-6">
         <Header name="Products" />
-        <button
-          className="flex items-center bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white font-bold py-2 px-6 rounded-lg shadow-md transition-all duration-300 transform hover:scale-105"
-          onClick={toggleCreateArea}
-        >
-          <PlusCircleIcon className="w-5 h-6 mr-2" />
-          Create Product
-        </button>
+        <CreateButton name="Create Product" onClickCreate={toggleCreateArea} />
       </div>
 
       {/* CREATE PRODUCT AREA */}

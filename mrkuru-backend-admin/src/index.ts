@@ -9,6 +9,7 @@ import morgan from "morgan";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import productRoutes from "./routes/productRoutes";
 import productStatusRoutes from "./routes/productStatusRoutes";
+import purchaseRoutes from "./routes/purchaseRoutes";
 
 // CONFIGURATIONS
 dotenv.config();
@@ -22,12 +23,13 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
 // ROUTES
-app.use("/dashboard", dashboardRoutes); // http://localhost:3000/dashboard/metrics
-app.use("/products", productRoutes); //http://localhost:3000/products
-app.use("/productStatus", productStatusRoutes); //http://localhost:3000/productStatus
+app.use("/dashboard", dashboardRoutes);
+app.use("/products", productRoutes);
+app.use("/productStatus", productStatusRoutes);
+app.use("/purchases", purchaseRoutes);
 
 // SERVER
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 8080;
 
 app.listen(port, () => {
   console.log(`Server is running on port ${port}`);

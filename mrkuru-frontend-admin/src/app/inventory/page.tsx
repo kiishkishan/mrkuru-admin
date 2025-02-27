@@ -20,7 +20,7 @@ import { createTheme, ThemeProvider } from "@mui/material";
 import Modal from "@/app/(components)/Modal";
 import { showToast } from "@/state/thunks/alertThunk";
 import useGetProducts from "@/app/(hooks)/getProducts";
-import StatusFilter from "../(components)/StatusFilter";
+import StatusFilter from "@/app/(components)/StatusFilter";
 
 interface ProductID {
   productId: string;
@@ -70,8 +70,6 @@ const Inventory = () => {
         dispatch(
           showToast("Product hold status updated successfully!", "success")
         );
-
-        // Refetch products after updating hold status
         refetchProducts();
       } catch (error) {
         console.error("Failed to hold selling product:", error);
@@ -102,11 +100,8 @@ const Inventory = () => {
   const handleConfirmDelete = async () => {
     if (selectedProduct) {
       try {
-        await deleteProduct(selectedProduct);
+        await deleteProduct(selectedProduct).unwrap();
         setIsModalOpen(false);
-
-        // Debug: Log to confirm the thunk is being called
-        console.log("Product deleted successfully. Dispatching toast...");
 
         // Show a success toast
         dispatch(showToast("Product deleted successfully!", "success"));
@@ -293,7 +288,7 @@ const Inventory = () => {
             <div className="flex items-center justify-center gap-2 w-full h-full">
               {/* Hold Selling Button */}
               <button
-                className="px-3 py-2 bg-gray-50 hover:bg-gray-200 font-semibold rounded-md text-sm shadow"
+                className="px-3 py-2 bg-gray-50 hover:bg-gray-200 font-semibold rounded-md text-sm shadow transition duration-200"
                 onClick={() =>
                   handleHoldSelling({
                     productId: params?.row?.productId,
@@ -307,7 +302,7 @@ const Inventory = () => {
 
               {/* Delete Button */}
               <Trash2
-                className="w-9 h-9 p-2 bg-gray-50 hover:bg-red-100 text-red-600 rounded-md shadow"
+                className="w-9 h-9 p-2 bg-gray-50 hover:bg-red-100 text-red-600 rounded-md shadow transition duration-200"
                 onClick={() => handleOpenModal(params?.row?.productId)}
               />
             </div>
@@ -363,6 +358,12 @@ const Inventory = () => {
           columns={columns}
           getRowId={(row) => row?.productId}
           className="bg-white shadow rounded-lg border border-gray-200 mt-5 !text-gray-700"
+          initialState={{
+            pagination: {
+              paginationModel: { pageSize: 5 },
+            },
+          }}
+          pageSizeOptions={[5, 10, 15, 20]}
         />
       </ThemeProvider>
       {isModalOpen && (

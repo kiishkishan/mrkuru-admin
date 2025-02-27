@@ -39,16 +39,6 @@ CREATE TABLE "Agents" (
 );
 
 -- CreateTable
-CREATE TABLE "Suppliers" (
-    "supplierId" TEXT NOT NULL,
-    "supplierName" TEXT NOT NULL,
-    "supplierContact" TEXT NOT NULL,
-    "supplierAddress" TEXT NOT NULL,
-
-    CONSTRAINT "Suppliers_pkey" PRIMARY KEY ("supplierId")
-);
-
--- CreateTable
 CREATE TABLE "Sales" (
     "saleId" TEXT NOT NULL,
     "agentId" TEXT,
@@ -83,6 +73,16 @@ CREATE TABLE "SalesSummary" (
 );
 
 -- CreateTable
+CREATE TABLE "Suppliers" (
+    "supplierId" TEXT NOT NULL,
+    "supplierName" TEXT NOT NULL,
+    "supplierContact" TEXT NOT NULL,
+    "supplierAddress" TEXT NOT NULL,
+
+    CONSTRAINT "Suppliers_pkey" PRIMARY KEY ("supplierId")
+);
+
+-- CreateTable
 CREATE TABLE "PurchaseStatus" (
     "purchaseStatusId" TEXT NOT NULL,
     "status" TEXT NOT NULL,
@@ -97,6 +97,7 @@ CREATE TABLE "Purchases" (
     "purchaseStatusId" TEXT NOT NULL,
     "timeStamp" TIMESTAMP(3) NOT NULL,
     "subTotal" DOUBLE PRECISION NOT NULL,
+    "amountPaid" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "Purchases_pkey" PRIMARY KEY ("purchaseId")
 );
