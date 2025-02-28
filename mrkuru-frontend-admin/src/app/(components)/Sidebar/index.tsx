@@ -32,8 +32,18 @@ const SidebarLink = memo(
     const isActive =
       pathname === href || (pathname === "/" && href === "/dashboard"); // handle link highlighting
 
+    const dispatch = useAppDispatch();
+
+    const handleClick = () => {
+      if (window.screen.width < 768) {
+        setTimeout(() => {
+          dispatch(setIsSidebarCollapsed(true));
+        }, 600);
+      }
+    };
+
     return (
-      <Link href={href}>
+      <Link href={href} onClick={handleClick}>
         <div
           className={`cursor-pointer flex items-center ${
             isColapsed ? "justify-center py-4" : "justify-start py-4 px-8"
@@ -75,7 +85,7 @@ const Sidebar = () => {
     <div className={sidebarClassNames}>
       {/* TOP LOGO */}
       <div
-        className={`flex gap-3 justify-center md:justify-evenly items-center pt-8 ${
+        className={`flex gap-3 justify-center md:justify-evenly items-center pt-6 ${
           isSidebarCollapsed ? "px-2" : "mx-10"
         }`}
       >
@@ -96,7 +106,7 @@ const Sidebar = () => {
       </div>
 
       {/* LINKS MENU */}
-      <div className="flex-grow mt-8">
+      <div className="flex-grow mt-6">
         <SidebarLink
           href="/dashboard"
           icon={Layout}

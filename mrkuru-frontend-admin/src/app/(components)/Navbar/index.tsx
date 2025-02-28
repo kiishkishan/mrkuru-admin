@@ -1,9 +1,8 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
-import { Bell, Menu, Moon, Settings, Sun } from "lucide-react";
+import { Bell, Menu, Moon, Sun } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import React from "react";
 
 const Navbar = () => {
@@ -34,13 +33,15 @@ const Navbar = () => {
         </button>
 
         <div className="relative">
-          <span className="font-bold text-xl">Mr.Kuru Inventory & CMS</span>
+          <span className="font-bold text-xs md:text-lg lg:text-xl">
+            Mr.Kuru Inventory & CMS
+          </span>
         </div>
       </div>
 
       {/* Right Side */}
       <div className="flex justify-between items-center gap-5">
-        <div className="hidden md:flex justify-between items-center gap-5">
+        <div className="flex justify-between items-center gap-5">
           <div>
             <button onClick={toggleDarkMode}>
               {isDarkMode ? (
@@ -56,13 +57,13 @@ const Navbar = () => {
               )}
             </button>
           </div>
-          <div className="relative">
+          <div className="relative hidden md:flex">
             <Bell className="cursor-pointer text-gray-500" size={24} />
             <span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-[0.4rem] py-1 text-xs font-semibold leading-none text-red-100 bg-red-400 rounded-full">
               3
             </span>
           </div>
-          <hr className="w-0 h-7 border border-solid border-l border-gray-300 mx-3" />
+          <hr className="w-0 h-7 border border-solid border-l border-gray-300 mx-0 md:mx-3" />
           <div className="flex items-center gap-3 cursor-pointer">
             <Image
               src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/profile.webp"
@@ -72,12 +73,9 @@ const Navbar = () => {
               className="rounded-full object-contain"
               priority
             />
-            <span className="font-semibold">Kishanth</span>
+            <span className="font-semibold hidden md:flex">Kishanth</span>
           </div>
         </div>
-        <Link href="/settings">
-          <Settings className="cursor-pointer text-gray-500" size={24} />
-        </Link>
       </div>
     </div>
   );

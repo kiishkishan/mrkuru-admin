@@ -2,9 +2,11 @@ import { useGetDashboardMetricsQuery } from "@/state/api";
 import { ShoppingBag } from "lucide-react";
 import React from "react";
 import Rating from "@/app/(components)/Rating";
+import Image from "next/image";
 
 const CardPopularProducts = () => {
   const { data: dashboardMetrics, isLoading } = useGetDashboardMetricsQuery();
+  console.log(dashboardMetrics?.popularProducts);
 
   return (
     <div
@@ -28,7 +30,18 @@ const CardPopularProducts = () => {
               >
                 {/* LEFT SIDE */}
                 <div className="flex items-center gap-3">
-                  <div>img</div>
+                  <div className="relative mb-4 rounded-xl w-fit h-fit bg-gray-100 overflow-hidden">
+                    <Image
+                      src={product?.imageUrl}
+                      alt={product?.name}
+                      width={40} // Fixed width
+                      height={40} // Fixed height
+                      className={`rounded-xl object-cover transition-opacity duration-300`}
+                      quality={60}
+                      priority
+                    />
+                  </div>
+
                   <div className="flex flex-col justify-between gap-1">
                     <div className="font-bold text-gray-700">
                       {product.name}
@@ -44,11 +57,11 @@ const CardPopularProducts = () => {
                 </div>
 
                 {/* RIGHT SIDE */}
-                <div className="text-sl flex items-center">
+                <div className="w-24 shrink-0 flex items-center gap-2">
                   <button className="p-2 rounded-full bg-blue-100 text-blue-600 mr-2">
                     <ShoppingBag className="w-4 h-4" />
                   </button>
-                  {product.stockQuantity} Sold
+                  <span className="text-sm">{product.stockQuantity} Sold</span>
                 </div>
               </div>
             ))}

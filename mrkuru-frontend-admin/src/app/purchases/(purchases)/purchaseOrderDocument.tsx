@@ -41,13 +41,14 @@ const styles = StyleSheet.create({
   page: { padding: 30, fontSize: 12, fontFamily: "Helvetica" },
   header: {
     textAlign: "center",
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
     marginBottom: 5,
+    color: "blue",
   },
   subHeader: {
     textAlign: "center",
-    fontSize: 14,
+    fontSize: 16,
     fontWeight: "bold",
     marginBottom: 20,
   },
@@ -90,7 +91,7 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
     <Document>
       <Page size="A4" style={styles.page}>
         {/* Header */}
-        <Text style={styles.header}>Mr.Kuru Electronics</Text>
+        <Text style={styles.header}>Mr.Kuru</Text>
         <Text style={styles.subHeader}>Purchase Order</Text>
 
         {/* Supplier Details */}
@@ -118,7 +119,8 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
 
           <View style={styles.subSection}>
             <Text style={styles.label}>
-              Purchase Date: {format(purchases?.timeStamp, "dd/MM/yyyy hh:mm")}
+              Purchase Date:{" "}
+              {purchases && format(purchases?.timeStamp, "dd/MM/yyyy hh:mm")}
             </Text>
           </View>
         </View>
@@ -150,8 +152,20 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
             >
               Qty
             </Text>
-            <Text style={styles.columnHeader}>Total</Text>
-            <Text style={styles.columnHeader}>Net Profit</Text>
+            <Text
+              style={
+                (styles.columnHeader, { width: "90px", textAlign: "center" })
+              }
+            >
+              Total
+            </Text>
+            <Text
+              style={
+                (styles.columnHeader, { width: "90px", textAlign: "center" })
+              }
+            >
+              Net Profit
+            </Text>
           </View>
 
           {/* Table Rows (Dynamic) */}
@@ -163,21 +177,30 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
               <Text
                 style={(styles.column, { width: "90px", textAlign: "center" })}
               >
-                {item.Products.price}
+                {item?.Products.price}
               </Text>
               <Text
                 style={(styles.column, { width: "90px", textAlign: "center" })}
               >
-                {item.unitPrice.toFixed(2)}
+                {item?.unitPrice.toFixed(2)}
               </Text>
               <Text
                 style={(styles.column, { width: "20px", textAlign: "center" })}
               >
-                {item.quantity}
+                {item?.quantity}
               </Text>
-              <Text style={styles.column}>{item.totalPrice.toFixed(2)}</Text>
-              <Text style={styles.column}>
-                {(item?.Products?.price * item.quantity).toFixed(2)}
+              <Text
+                style={(styles.column, { width: "90px", textAlign: "center" })}
+              >
+                {item?.totalPrice.toFixed(2)}
+              </Text>
+              <Text
+                style={(styles.column, { width: "90px", textAlign: "center" })}
+              >
+                {(
+                  item?.Products?.price * item.quantity -
+                  item?.totalPrice
+                ).toFixed(2)}
               </Text>
             </View>
           ))}
