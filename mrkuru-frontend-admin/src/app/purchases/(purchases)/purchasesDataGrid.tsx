@@ -12,37 +12,6 @@ import DataGridSkeleton from "@/app/(components)/Skeleton/dataGridSkeleton";
 import PurchaseOrderDocument from "@/app/purchases/(purchases)/purchaseOrderDocument";
 import { usePDF } from "@react-pdf/renderer";
 
-// type PurchaseProps = {
-//   purchaseId: string;
-//   timeStamp: string;
-//   Suppliers: {
-//     supplierId: string;
-//     supplierName: string;
-//     supplierAddress: string;
-//     supplierContact: string;
-//   };
-//   PurchaseStatus: {
-//     purchaseStatusId: string;
-//     status: string;
-//   };
-//   PurchaseDetails: PurchaseDetailProps[];
-//   subTotal: number;
-//   amountPaid: number;
-// };
-
-// type PurchaseDetailProps = {
-//   purchaseDetailsId: string;
-//   unitPrice: number;
-//   totalPrice: number;
-//   qty: number;
-//   Products: {
-//     productId: string;
-//     name: string;
-//     price: number;
-//     stockQuantity: number;
-//   };
-// };
-
 const PurchasesDataGrid = () => {
   const { data: purchases, isLoading, isError } = useGetPurchasesQuery();
 

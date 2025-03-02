@@ -22,6 +22,8 @@ type PurchaseProps = {
   PurchaseDetails: PurchaseDetailProps[];
   subTotal: number;
   amountPaid: number;
+  shippingFee: number;
+  totalAmount: number;
 };
 
 type PurchaseDetailProps = {
@@ -75,8 +77,31 @@ const styles = StyleSheet.create({
   totalSection: {
     marginTop: 15,
     padding: 10,
-    borderTopWidth: 1,
-    borderTopColor: "#000",
+    textAlign: "right",
+    alignSelf: "flex-end",
+    width: 180,
+  },
+  summaryLabel: {
+    fontSize: 12,
+    fontWeight: "bold",
+    width: 100, // Adjusted width
+  },
+  summaryValue: {
+    fontSize: 12,
+    textAlign: "right",
+    width: 80, // Adjusted width
+  },
+  summaryRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+  line: {
+    borderBottomWidth: 1,
+    borderBottomColor: "#000",
+    width: "100%",
+    alignSelf: "flex-end",
+    marginVertical: 10,
   },
   footer: { marginTop: 20, textAlign: "center", fontSize: 10 },
 });
@@ -126,7 +151,7 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
         {/* Table Headers */}
         <View style={styles.table}>
           <View style={[styles.row, { backgroundColor: "#f3f3f3" }]}>
-            <Text style={(styles.columnHeader, { width: "120px" })}>
+            <Text style={(styles.columnHeader, { width: "150px" })}>
               Product Name
             </Text>
             <Text
@@ -157,7 +182,7 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
           {/* Table Rows (Dynamic) */}
           {purchases?.PurchaseDetails?.map((item: PurchaseDetailProps) => (
             <View key={item?.purchaseDetailsId} style={styles.row}>
-              <Text style={(styles.column, { width: "120px" })}>
+              <Text style={(styles.column, { width: "150px" })}>
                 {item.Products?.name}
               </Text>
               <Text
@@ -185,11 +210,30 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
 
         {/* Summary Section */}
         <View style={styles.totalSection}>
-          <Text style={styles.label}>Subtotal: {purchases?.subTotal}</Text>
-          <Text style={styles.label}>Amount Paid: {purchases?.amountPaid}</Text>
-          <Text style={styles.label}>
-            Balance: {purchases?.subTotal - purchases?.amountPaid}
-          </Text>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Subtotal :</Text>
+            <Text style={styles.summaryValue}>{purchases?.subTotal}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Shipping Fee :</Text>
+            <Text style={styles.summaryValue}>{purchases?.shippingFee}</Text>
+          </View>
+          <View style={styles.line} />
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Total Amount :</Text>
+            <Text style={styles.summaryValue}>{purchases?.totalAmount}</Text>
+          </View>
+          <View style={styles.line} />
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Amount Paid :</Text>
+            <Text style={styles.summaryValue}>{purchases?.amountPaid}</Text>
+          </View>
+          <View style={styles.summaryRow}>
+            <Text style={styles.summaryLabel}>Balance :</Text>
+            <Text style={styles.summaryValue}>
+              {purchases?.subTotal - purchases?.amountPaid}
+            </Text>
+          </View>
         </View>
       </Page>
     </Document>

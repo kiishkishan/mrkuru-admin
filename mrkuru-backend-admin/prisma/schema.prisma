@@ -95,6 +95,8 @@ model Purchases {
   purchaseStatusId String
   timeStamp        DateTime
   subTotal         Float
+  shippingFee      Float
+  totalAmount      Float
   amountPaid       Float
   PurchaseStatus   PurchaseStatus    @relation(fields: [purchaseStatusId], references: [purchaseStatusId])
   Suppliers        Suppliers         @relation(fields: [supplierId], references: [supplierId])

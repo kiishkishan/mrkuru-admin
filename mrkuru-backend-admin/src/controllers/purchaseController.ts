@@ -236,6 +236,8 @@ export const getAllPurchases = async (req: Request, res: Response) => {
         },
         subTotal: true,
         amountPaid: true,
+        shippingFee: true,
+        totalAmount: true,
       },
     });
     res.status(200).json(purchases);

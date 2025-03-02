@@ -233,6 +233,8 @@ const getAllPurchases = (req, res) => __awaiter(void 0, void 0, void 0, function
                 },
                 subTotal: true,
                 amountPaid: true,
+                shippingFee: true,
+                totalAmount: true,
             },
         });
         res.status(200).json(purchases);

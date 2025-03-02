@@ -77,6 +77,8 @@ export interface Purchases {
   purchaseId: string;
   timeStamp: string;
   subTotal: number;
+  shippingFee: number;
+  totalAmount: number;
   amountPaid: number;
 }
 
