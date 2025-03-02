@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useGetPurchasesQuery } from "@/state/api";
 import { useAppSelector } from "@/app/redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
@@ -21,7 +21,7 @@ const PurchasesDataGrid = () => {
     (state) => state.global.isSidebarCollapsed
   );
 
-  const [selectedPurchase, setSelectedPurchase] = useState<any>();
+  const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal State
 
   // PDF
@@ -29,10 +29,14 @@ const PurchasesDataGrid = () => {
     document: <PurchaseOrderDocument purchases={selectedPurchase} />,
   });
 
+  useEffect(() => {
+    if (selectedPurchase) {
+      update(<PurchaseOrderDocument purchases={selectedPurchase} />);
+    }
+  }, [selectedPurchase, update]);
+
   const openModal = (purchase: object) => {
     setSelectedPurchase(purchase);
-    console.log("selectedPurchase", selectedPurchase);
-    update(<PurchaseOrderDocument purchases={selectedPurchase} />); // Update PDF rendering
     setIsModalOpen(true);
   };
 
