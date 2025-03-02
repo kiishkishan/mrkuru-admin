@@ -74,7 +74,11 @@ const styles = StyleSheet.create({
     backgroundColor: "#f3f3f3",
     paddingVertical: 8,
   },
-  column: { flex: 1, fontSize: 10, textAlign: "center" },
+  column: {
+    flex: 1,
+    fontSize: 10,
+    textAlign: "center",
+  },
   totalSection: {
     marginTop: 15,
     padding: 10,
@@ -107,6 +111,11 @@ const styles = StyleSheet.create({
   footer: { marginTop: 20, textAlign: "center", fontSize: 10 },
 });
 
+// Function to format numbers with commas
+const formatNumber = (number: number) => {
+  return number?.toLocaleString();
+};
+
 const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
   useEffect(() => {
     console.log("PurchaseOrderDocument", purchases);
@@ -133,6 +142,9 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
 
         {/* Purchase Details */}
         <View style={styles.section}>
+          <Text style={(styles.label, { width: "60%", marginBottom: 10 })}>
+            Purchase ID : {purchases?.purchaseId}
+          </Text>
           <Text style={styles.label}>
             Purchase Status: {purchases?.PurchaseStatus?.status}
           </Text>
@@ -153,12 +165,12 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
         {/* Table Headers */}
         <View style={styles.table}>
           <View style={[styles.row, { backgroundColor: "#f3f3f3" }]}>
-            <Text style={(styles.columnHeader, { width: "150px" })}>
+            <Text style={(styles.columnHeader, { width: "170px" })}>
               Product Name
             </Text>
             <Text
               style={
-                (styles.columnHeader, { width: "90px", textAlign: "center" })
+                (styles.columnHeader, { width: "110px", textAlign: "center" })
               }
             >
               Product Price
@@ -172,7 +184,7 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
             </Text>
             <Text
               style={
-                (styles.columnHeader, { width: "20px", textAlign: "center" })
+                (styles.columnHeader, { width: "30px", textAlign: "center" })
               }
             >
               Qty
@@ -196,46 +208,47 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
           {/* Table Rows (Dynamic) */}
           {purchases?.PurchaseDetails?.map((item: PurchaseDetailProps) => (
             <View key={item?.purchaseDetailsId} style={styles.row}>
-              <Text style={(styles.column, { width: "150px" })}>
+              <Text style={(styles.column, { width: "170px" })}>
                 {item.Products?.name}
               </Text>
               <Text
-                style={(styles.column, { width: "90px", textAlign: "center" })}
+                style={(styles.column, { width: "110px", textAlign: "center" })}
               >
-                {item?.Products.price}
+                {formatNumber(item?.Products.price)}
               </Text>
               <Text
                 style={(styles.column, { width: "90px", textAlign: "center" })}
               >
-                {item?.unitPrice.toFixed(2)}
+                {formatNumber(item?.unitPrice)}
               </Text>
               <Text
-                style={(styles.column, { width: "20px", textAlign: "center" })}
+                style={(styles.column, { width: "30px", textAlign: "center" })}
               >
                 {item?.quantity}
               </Text>
               <Text
                 style={(styles.column, { width: "90px", textAlign: "center" })}
               >
-                {item?.totalPrice.toFixed(2)}
+                {formatNumber(item?.totalPrice)}
               </Text>
               <Text
                 style={(styles.column, { width: "90px", textAlign: "center" })}
               >
-                {(
-                  item?.Products?.price * item.quantity -
-                  item?.totalPrice
-                ).toFixed(2)}
+                {formatNumber(
+                  item?.Products?.price * item.quantity - item?.totalPrice
+                )}
               </Text>
             </View>
-          ))}
+          )).map((item) => item)}
         </View>
 
         {/* Summary Section */}
         <View style={styles.totalSection}>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Subtotal :</Text>
-            <Text style={styles.summaryValue}>{purchases?.subTotal}</Text>
+            <Text style={styles.summaryValue}>
+              {formatNumber(purchases?.subTotal)}
+            </Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Shipping Fee :</Text>
@@ -244,17 +257,21 @@ const PurchaseOrderDocument = ({ purchases }: PurchaseOrderDocumentProps) => {
           <View style={styles.line} />
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Total Amount :</Text>
-            <Text style={styles.summaryValue}>{purchases?.totalAmount}</Text>
+            <Text style={styles.summaryValue}>
+              {formatNumber(purchases?.totalAmount)}
+            </Text>
           </View>
           <View style={styles.line} />
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Amount Paid :</Text>
-            <Text style={styles.summaryValue}>{purchases?.amountPaid}</Text>
+            <Text style={styles.summaryValue}>
+              {formatNumber(purchases?.amountPaid)}
+            </Text>
           </View>
           <View style={styles.summaryRow}>
             <Text style={styles.summaryLabel}>Balance :</Text>
             <Text style={styles.summaryValue}>
-              {purchases?.subTotal - purchases?.amountPaid}
+              {formatNumber(purchases?.subTotal - purchases?.amountPaid)}
             </Text>
           </View>
         </View>
