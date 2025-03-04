@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getAllPurchases = exports.createPurchaseStatus = exports.getPurchaseStatus = exports.deletePurchaseStatus = exports.deleteSupplier = exports.createSuppliers = exports.getSuppliers = void 0;
+exports.getAllPurchases = exports.updatePurchaseStatus = exports.createPurchaseStatus = exports.getPurchaseStatus = exports.deletePurchaseStatus = exports.deleteSupplier = exports.createSuppliers = exports.getSuppliers = void 0;
 const client_1 = require("@prisma/client");
 const prisma = new client_1.PrismaClient();
 const getSuppliers = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -192,6 +192,63 @@ const createPurchaseStatus = (req, res) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.createPurchaseStatus = createPurchaseStatus;
+const updatePurchaseStatus = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { purchaseId, targetStatusId } = req.body;
+        if (!purchaseId || !targetStatusId) {
+            res.status(400).json({ message: "Missing required fields!" });
+            return;
+        }
+        const currentPurchase = yield prisma.purchases.findUnique({
+            where: { purchaseId },
+            select: {
+                PurchaseStatus: {
+                    select: {
+                        purchaseStatusId: true,
+                        status: true,
+                    },
+                },
+            },
+        });
+        const currentStatus = yield prisma.purchaseStatus.findUnique({
+            where: {
+                purchaseStatusId: targetStatusId,
+            },
+            select: {
+                status: true,
+            },
+        });
+        if (!currentPurchase) {
+            res.status(404).json({ message: "Purchase not found." });
+            return;
+        }
+        const updatedPurchase = yield prisma.purchases.update({
+            where: { purchaseId },
+            data: {
+                PurchaseStatus: {
+                    connect: {
+                        purchaseStatusId: targetStatusId,
+                        status: currentStatus === null || currentStatus === void 0 ? void 0 : currentStatus.status,
+                    },
+                },
+            },
+        });
+        res.status(200).json(updatedPurchase);
+    }
+    catch (error) {
+        console.error("Error updating purchase status:", error);
+        if (error.code === "P2025") {
+            res.status(404).json({ message: "Purchase not found." });
+        }
+        else {
+            res.status(500).json({
+                message: "An unexpected error occurred.",
+                error: error.message,
+            });
+        }
+    }
+});
+exports.updatePurchaseStatus = updatePurchaseStatus;
 const getAllPurchases = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const purchases = yield prisma.purchases.findMany({

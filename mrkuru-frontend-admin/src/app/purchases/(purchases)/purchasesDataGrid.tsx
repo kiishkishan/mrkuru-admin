@@ -5,24 +5,27 @@ import { useAppSelector } from "@/app/redux";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 import { createTheme, ThemeProvider } from "@mui/material";
 import { format } from "date-fns";
-import { Download, Edit3, Trash2, X } from "lucide-react";
+import { Download, Edit3, Trash2 } from "lucide-react";
 import CreateButton from "@/app/(components)/Button/createButton";
 import SubHeadingSkeleton from "@/app/(components)/Skeleton/subHeadingSkeleton";
 import DataGridSkeleton from "@/app/(components)/Skeleton/dataGridSkeleton";
 import PurchaseOrderDocument from "@/app/purchases/(purchases)/purchaseOrderDocument";
 import { usePDF } from "@react-pdf/renderer";
+import PurchaseOrderModal from "./purchaseOrderModal";
+import PurchaseStatusChangeModal from "./purchaseStatusChangeModal";
 
 const PurchasesDataGrid = () => {
   const { data: purchases, isLoading, isError } = useGetPurchasesQuery();
 
   // redux states
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state) => state?.global.isDarkMode);
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
+    (state) => state?.global.isSidebarCollapsed
   );
 
   const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal State
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isChangeStatusModalOpen, setIsChangeStatusModalOpen] = useState(false);
 
   // PDF
   const [instance, update] = usePDF({
@@ -41,6 +44,16 @@ const PurchasesDataGrid = () => {
   };
 
   const closeModal = () => setIsModalOpen(false);
+
+  const openChangeStatusModal = (purchase: object) => {
+    console.log("openModal purchase", purchase);
+    setSelectedPurchase(purchase);
+    setIsChangeStatusModalOpen(true);
+  };
+
+  const closeChangeStatusModal = () => {
+    setIsChangeStatusModalOpen(false);
+  };
 
   const columns: GridColDef[] = [
     {
@@ -156,11 +169,14 @@ const PurchasesDataGrid = () => {
           <p className="font-bold">Actions</p>
         </div>
       ),
-      renderCell: () => {
+      renderCell: (params) => {
         return (
           <div className="flex items-center justify-center gap-3 w-full h-full">
             {/* Hold Selling Button */}
-            <button className="px-3 py-2 bg-white hover:bg-gray-200 font-semibold rounded-md text-sm shadow-md transition duration-200">
+            <button
+              className="px-3 py-2 bg-white hover:bg-gray-200 font-semibold rounded-md text-sm shadow-md transition duration-200"
+              onClick={() => openChangeStatusModal(params.row)}
+            >
               Change Status
             </button>
             <Edit3 className="w-9 h-9 p-2 bg-white hover:bg-blue-200 text-gray-600 hover:text-gray-900 rounded-md shadow-md transition duration-200" />
@@ -225,46 +241,13 @@ const PurchasesDataGrid = () => {
         ** TPP = Total Products Purchased
       </p>
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white w-11/12 md:w-3/4 lg:w-2/3 xl:w-1/2 p-5 rounded-lg shadow-lg relative">
-            {/* Close Button */}
-            <button
-              onClick={closeModal}
-              className="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-            >
-              <X className="w-6 h-6" />
-            </button>
-
-            {/* Modal Header */}
-            <h2 className="text-lg font-semibold text-gray-700 mb-4">
-              Purchase Order Preview
-            </h2>
-
-            {/* PDF Preview */}
-            {instance.url ? (
-              <iframe
-                src={instance.url}
-                className="w-full h-96 border rounded-lg"
-              ></iframe>
-            ) : (
-              <p className="text-center text-gray-500">
-                Generating PDF preview...
-              </p>
-            )}
-
-            {/* Download PDF */}
-            <div className="mt-4 flex justify-end">
-              <a
-                href={instance.url || ""}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
-              >
-                Download PDF
-              </a>
-            </div>
-          </div>
-        </div>
+        <PurchaseOrderModal closeModal={closeModal} instance={instance} />
+      )}
+      {isChangeStatusModalOpen && (
+        <PurchaseStatusChangeModal
+          onClose={closeChangeStatusModal}
+          selectedRow={selectedPurchase}
+        />
       )}
     </div>
   );
