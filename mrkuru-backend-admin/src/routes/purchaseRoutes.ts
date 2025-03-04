@@ -7,6 +7,7 @@ import {
   createSuppliers,
   deleteSupplier,
   deletePurchaseStatus,
+  updatePurchaseStatus,
 } from "../controllers/purchaseController";
 
 const router = Router();
@@ -16,6 +17,7 @@ router.post("/suppliers", createSuppliers);
 router.delete("/suppliers", deleteSupplier);
 router.get("/purchaseStatus", getPurchaseStatus);
 router.post("/purchaseStatus", createPurchaseStatus);
+router.put("/purchaseStatus", updatePurchaseStatus);
 router.delete("/purchaseStatus", deletePurchaseStatus);
 router.get("/", getAllPurchases);
 

@@ -73,10 +73,17 @@ export interface NewPurchaseStatus {
   status: string;
 }
 
+export interface UpdatePurchaseStatus {
+  purchaseId: string;
+  targetStatusId: string;
+}
+
 export interface Purchases {
   purchaseId: string;
   timeStamp: string;
   subTotal: number;
+  shippingFee: number;
+  totalAmount: number;
   amountPaid: number;
 }
 
@@ -246,6 +253,14 @@ export const api = createApi({
       }),
       invalidatesTags: ["Purchases"],
     }),
+    updatePurchaseStatus: build.mutation<PurchaseStatus, UpdatePurchaseStatus>({
+      query: (updatePurchaseStatus: UpdatePurchaseStatus) => ({
+        url: `purchases/purchaseStatus`,
+        method: "PUT",
+        body: updatePurchaseStatus,
+      }),
+      invalidatesTags: ["Purchases"],
+    }),
   }),
 });
 
@@ -264,4 +279,5 @@ export const {
   useCreateSupplierMutation,
   useDeleteSupplierMutation,
   useDeletePurchaseStatusMutation,
+  useUpdatePurchaseStatusMutation,
 } = api;

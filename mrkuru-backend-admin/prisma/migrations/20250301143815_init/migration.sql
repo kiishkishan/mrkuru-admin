@@ -97,6 +97,8 @@ CREATE TABLE "Purchases" (
     "purchaseStatusId" TEXT NOT NULL,
     "timeStamp" TIMESTAMP(3) NOT NULL,
     "subTotal" DOUBLE PRECISION NOT NULL,
+    "shippingFee" DOUBLE PRECISION NOT NULL,
+    "totalAmount" DOUBLE PRECISION NOT NULL,
     "amountPaid" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "Purchases_pkey" PRIMARY KEY ("purchaseId")

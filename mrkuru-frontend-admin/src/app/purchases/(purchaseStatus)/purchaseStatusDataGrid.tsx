@@ -26,7 +26,7 @@ const PurchaseStatusDataGrid = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<string | null>(null);
 
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state) => state?.global.isDarkMode);
   const dispatch = useAppDispatch();
 
   const {

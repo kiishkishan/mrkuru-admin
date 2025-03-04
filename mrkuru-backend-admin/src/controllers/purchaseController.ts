@@ -195,6 +195,67 @@ export const createPurchaseStatus = async (req: Request, res: Response) => {
   }
 };
 
+export const updatePurchaseStatus = async (req: Request, res: Response) => {
+  try {
+    const { purchaseId, targetStatusId } = req.body;
+
+    if (!purchaseId || !targetStatusId) {
+      res.status(400).json({ message: "Missing required fields!" });
+      return;
+    }
+
+    const currentPurchase = await prisma.purchases.findUnique({
+      where: { purchaseId },
+      select: {
+        PurchaseStatus: {
+          select: {
+            purchaseStatusId: true,
+            status: true,
+          },
+        },
+      },
+    });
+
+    const currentStatus = await prisma.purchaseStatus.findUnique({
+      where: {
+        purchaseStatusId: targetStatusId,
+      },
+      select: {
+        status: true,
+      },
+    });
+
+    if (!currentPurchase) {
+      res.status(404).json({ message: "Purchase not found." });
+      return;
+    }
+
+    const updatedPurchase = await prisma.purchases.update({
+      where: { purchaseId },
+      data: {
+        PurchaseStatus: {
+          connect: {
+            purchaseStatusId: targetStatusId,
+            status: currentStatus?.status,
+          },
+        },
+      },
+    });
+
+    res.status(200).json(updatedPurchase);
+  } catch (error: any) {
+    console.error("Error updating purchase status:", error);
+    if (error.code === "P2025") {
+      res.status(404).json({ message: "Purchase not found." });
+    } else {
+      res.status(500).json({
+        message: "An unexpected error occurred.",
+        error: error.message,
+      });
+    }
+  }
+};
+
 export const getAllPurchases = async (req: Request, res: Response) => {
   try {
     const purchases = await prisma.purchases.findMany({
@@ -236,6 +297,8 @@ export const getAllPurchases = async (req: Request, res: Response) => {
         },
         subTotal: true,
         amountPaid: true,
+        shippingFee: true,
+        totalAmount: true,
       },
     });
     res.status(200).json(purchases);
