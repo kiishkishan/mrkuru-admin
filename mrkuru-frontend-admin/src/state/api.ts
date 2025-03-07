@@ -1,5 +1,12 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
+// login type
+
+export interface Login {
+  email: string;
+  password: string;
+}
+
 // getProducts type
 export interface Products {
   productId: string;
@@ -129,6 +136,14 @@ export const api = createApi({
   reducerPath: "api",
   tagTypes: ["DashboardMetrics", "Product", "ProductStatus", "Purchases"],
   endpoints: (build) => ({
+    // Authentication
+    loginUser: build.mutation<{ token: string }, Login>({
+      query: (login: Login) => ({
+        url: "auth/login",
+        method: "POST",
+        body: login,
+      }),
+    }),
     // Dashboard
     getDashboardMetrics: build.query<DashboardMetrics, void>({
       query: () => "dashboard/metrics",
@@ -265,6 +280,7 @@ export const api = createApi({
 });
 
 export const {
+  useLoginUserMutation,
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
   useUploadImagetoS3Mutation,

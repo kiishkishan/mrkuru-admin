@@ -14,9 +14,11 @@ datasource db {
 }
 
 model Users {
-  userId String @id
-  name   String
-  email  String @unique
+  userId       String  @id
+  name         String
+  email        String  @unique
+  password     String
+  profileImage String?
 }
 
 model ProductStatus {

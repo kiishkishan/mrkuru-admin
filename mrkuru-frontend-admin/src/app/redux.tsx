@@ -12,6 +12,7 @@ import {
 } from "react-redux";
 import globalReducer from "@/state/";
 import alertReducer from "@/state/slices/alertSlice";
+import authReducer from "@/state/slices/authSlice";
 import { api } from "@/state/api";
 import { setupListeners } from "@reduxjs/toolkit/query";
 
@@ -56,6 +57,7 @@ const persistConfig = {
 const rootReducer = combineReducers({
   global: globalReducer,
   alert: alertReducer,
+  auth: authReducer,
   [api.reducerPath]: api.reducer,
 });
 const persistedReducer = persistReducer(persistConfig, rootReducer);

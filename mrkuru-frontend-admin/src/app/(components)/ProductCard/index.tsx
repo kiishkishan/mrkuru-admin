@@ -4,7 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import Rating from "@/app/(components)/Rating";
 
-interface Product {
+type Product = {
   productId: string;
   name: string;
   price: number;
@@ -12,13 +12,14 @@ interface Product {
   rating?: number;
   details?: string;
   imageUrl: string;
-}
+};
 
 interface ProductCardProps {
   product: Product;
+  miniCard?: boolean;
 }
 
-const ProductCard = ({ product }: ProductCardProps) => {
+const ProductCard = ({ product, miniCard }: ProductCardProps) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const fallbackImage =
     "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/no_product_img_found.webp";
@@ -29,7 +30,11 @@ const ProductCard = ({ product }: ProductCardProps) => {
     bg-gradient-to-b from-white to-gray-50 transition-all duration-300 hover:-translate-y-1.5"
     >
       <div className="flex flex-col items-center">
-        <div className="relative mb-4 rounded-xl w-36 h-36 bg-gray-100 overflow-hidden aspect-square">
+        <div
+          className={`relative mb-4 rounded-xl ${
+            miniCard ? "w-24 h-24" : "w-36 h-36"
+          } bg-gray-100 overflow-hidden aspect-square`}
+        >
           <Image
             src={product?.imageUrl || fallbackImage}
             alt={product?.name}
@@ -38,7 +43,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
             className={`rounded-xl object-cover w-auto h-auto ${
               imageLoaded ? "opacity-100" : "opacity-0"
             } transition-opacity duration-300`}
-            quality={80}
+            quality={miniCard ? 60 : 80}
             priority
             onLoad={() => setImageLoaded(true)}
             onError={(e) => {
@@ -65,7 +70,7 @@ const ProductCard = ({ product }: ProductCardProps) => {
           {product?.stockQuantity} in stock
         </div>
 
-        {product?.rating && (
+        {product?.rating && !miniCard && (
           <div className="flex items-center mb-4">
             <Rating rating={product?.rating} />
             <span className="ml-2 text-sm text-gray-600">
@@ -74,16 +79,13 @@ const ProductCard = ({ product }: ProductCardProps) => {
           </div>
         )}
 
-        {product?.details && (
+        {product?.details && !miniCard && (
           <div className="w-full">
             <div className="text-sm text-gray-600 line-clamp-3 transition-all">
-              {product.details}
+              {product.details.length > 100
+                ? `${product.details.substring(0, 100)}...`
+                : product.details}
             </div>
-            {product.details.length > 100 && (
-              <button className="text-blue-600 text-sm font-medium mt-1 hover:text-blue-700">
-                Show more
-              </button>
-            )}
           </div>
         )}
       </div>

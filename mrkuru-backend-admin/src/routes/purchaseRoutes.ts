@@ -9,6 +9,7 @@ import {
   deletePurchaseStatus,
   updatePurchaseStatus,
 } from "../controllers/purchaseController";
+import { loginUser } from "../controllers/authController";
 
 const router = Router();
 
