@@ -25,7 +25,9 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         // Find user by email
-        const user = yield prisma.users.findUnique({ where: { email } });
+        const user = yield prisma.users.findUnique({
+            where: { email },
+        });
         if (!user) {
             res.status(400).json({ message: "No user found with this email" });
             return;
@@ -41,7 +43,9 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const token = jsonwebtoken_1.default.sign({ id: user.userId }, process.env.JWT_SECRET);
-        res.status(201).json({ token });
+        res
+            .status(201)
+            .json({ token, userName: user.name, userImage: user.profileImage });
     }
     catch (error) {
         console.error("Error logging in:", error);

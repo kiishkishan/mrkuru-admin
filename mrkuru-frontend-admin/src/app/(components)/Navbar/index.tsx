@@ -13,6 +13,7 @@ const Navbar = () => {
   );
 
   const isDarkMode = useAppSelector((state) => state?.global.isDarkMode);
+  const { userName, userImage } = useAppSelector((state) => state.auth);
 
   // const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
@@ -72,15 +73,30 @@ const Navbar = () => {
           </div>
           <hr className="w-0 h-7 border border-solid border-l border-gray-300 mx-0 md:mx-3" />
           <div className="flex items-center gap-3 cursor-pointer">
-            <Image
-              src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/profile.webp"
-              alt="Profile"
-              width={25}
-              height={25}
-              className="rounded-full object-contain w-auto h-auto"
-              priority
-            />
-            <span className="font-semibold hidden md:flex">Kishanth</span>
+            {userImage ? (
+              <Image
+                src={userImage}
+                alt="Profile"
+                width={25}
+                height={25}
+                className="rounded-full object-contain w-auto h-auto"
+                priority
+              />
+            ) : (
+              <Image
+                src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/profile.webp"
+                alt="Profile"
+                width={25}
+                height={25}
+                className="rounded-full object-contain w-auto h-auto"
+                priority
+              />
+            )}
+            {userName ? (
+              <span className="font-semibold hidden md:flex">{userName}</span>
+            ) : (
+              <span className="font-semibold hidden md:flex">Kishanth</span>
+            )}
           </div>
           <LogOut
             className="cursor-pointer text-gray-500 hover:text-blue-500 transition-all duration-300 ease-linear"

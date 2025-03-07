@@ -15,7 +15,9 @@ export const loginUser = async (req: Request, res: Response) => {
     }
 
     // Find user by email
-    const user = await prisma.users.findUnique({ where: { email } });
+    const user = await prisma.users.findUnique({
+      where: { email },
+    });
 
     if (!user) {
       res.status(400).json({ message: "No user found with this email" });
@@ -37,7 +39,9 @@ export const loginUser = async (req: Request, res: Response) => {
 
     const token = jwt.sign({ id: user.userId }, process.env.JWT_SECRET);
 
-    res.status(201).json({ token });
+    res
+      .status(201)
+      .json({ token, userName: user.name, userImage: user.profileImage });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ message: "Error logging in" });
