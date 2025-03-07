@@ -177,7 +177,7 @@ const LoginPage = () => {
             width={500}
             height={250}
             className="object-cover w-full h-full"
-            quality={90}
+            quality={80}
             priority
           />
         </div>
