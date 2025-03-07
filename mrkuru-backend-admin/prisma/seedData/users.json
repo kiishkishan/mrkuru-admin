@@ -2,6 +2,8 @@
   {
     "userId": "f6d07300-05eb-4086-98ff-3149b9692ad2",
     "name": "Kishanth",
-    "email": "kishanth001@gmail.com"
+    "email": "kishanth001@gmail.com",
+    "password": "$2a$12$ZZaBxrVeoPgDUhZmBV0IdujjofcVlW/DOOmveB7VdCAUt8k3BU8jW",
+    "profileImage": "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/profile.webp"
   }
 ]

@@ -154,7 +154,7 @@ const SuppliersDataGrid = () => {
       <div className="py-4 flex flex-col mt-5 gap-4">
         <SubHeadingSkeleton style="w-1/4 h-6" />
         <SubHeadingSkeleton style="w-2/5 h-8" />
-        <DataGridSkeleton rows={3} style="w-full xl:w-fit overflow-x-hidden" />
+        <DataGridSkeleton rows={4} style="w-full xl:w-fit overflow-x-hidden" />
       </div>
     );
   }

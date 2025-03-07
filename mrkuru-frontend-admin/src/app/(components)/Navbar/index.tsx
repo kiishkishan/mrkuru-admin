@@ -1,17 +1,20 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
-import { Bell, Menu, Moon, Sun } from "lucide-react";
+import { logoutUser } from "@/state/slices/authSlice";
+import { Bell, LogOut, Menu, Moon, Sun } from "lucide-react";
 import Image from "next/image";
 import React from "react";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
+    (state) => state?.global.isSidebarCollapsed
   );
 
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state) => state?.global.isDarkMode);
+
+  // const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   const toggleSidebar = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
@@ -19,6 +22,10 @@ const Navbar = () => {
 
   const toggleDarkMode = () => {
     dispatch(setIsDarkMode(!isDarkMode));
+  };
+
+  const toggleLogout = () => {
+    dispatch(logoutUser());
   };
 
   return (
@@ -41,7 +48,7 @@ const Navbar = () => {
 
       {/* Right Side */}
       <div className="flex justify-between items-center gap-5">
-        <div className="flex justify-between items-center gap-5">
+        <div className="flex justify-between items-center gap-2.5 md:gap-5">
           <div>
             <button onClick={toggleDarkMode}>
               {isDarkMode ? (
@@ -70,11 +77,16 @@ const Navbar = () => {
               alt="Profile"
               width={25}
               height={25}
-              className="rounded-full object-contain"
+              className="rounded-full object-contain w-auto h-auto"
               priority
             />
             <span className="font-semibold hidden md:flex">Kishanth</span>
           </div>
+          <LogOut
+            className="cursor-pointer text-gray-500 hover:text-blue-500 transition-all duration-300 ease-linear"
+            size={24}
+            onClick={toggleLogout}
+          />
         </div>
       </div>
     </div>

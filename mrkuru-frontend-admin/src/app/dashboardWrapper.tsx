@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import Navbar from "@/app/(components)/Navbar";
 import Sidebar from "@/app/(components)/Sidebar";
 import StoreProvider, { useAppSelector } from "./redux";
+import LoginPage from "./login/page";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -11,20 +12,33 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
 
   const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   useEffect(() => {
     if (isDarkMode) {
       document.documentElement.classList.add("dark");
+      document.documentElement.classList.remove("light");
     } else {
+      document.documentElement.classList.add("light");
       document.documentElement.classList.remove("light");
     }
-  });
+  }, [isDarkMode]);
+
+  const layoutClasses = isDarkMode ? "dark" : "light";
+
+  // If user is not authenticated, show login page
+  if (isAuthenticated === false) {
+    console.log("User is not authenticated");
+    return (
+      <div className={`${layoutClasses}`}>
+        <LoginPage />
+      </div>
+    );
+  }
 
   return (
     <div
-      className={`${
-        isDarkMode ? "dark" : "light"
-      } flex bg-gray-50 text-gray-900 w-full min-h-screen`}
+      className={`${layoutClasses} flex bg-gray-50 text-gray-900 w-full min-h-screen`}
     >
       <Sidebar />
       <main
