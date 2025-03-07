@@ -4,15 +4,22 @@ import React, { useEffect } from "react";
 import Navbar from "@/app/(components)/Navbar";
 import Sidebar from "@/app/(components)/Sidebar";
 import StoreProvider, { useAppSelector } from "./redux";
-import LoginPage from "./login/page";
+import LoginPage from "@/app/login/page";
+import useRouterReady from "@/app/(hooks)/useRouterReady";
+import SignupPage from "@/app/signup/page";
+// import SignupPage from "./signup/page";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
+    (state) => state?.global.isSidebarCollapsed
   );
 
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const isDarkMode = useAppSelector((state) => state?.global.isDarkMode);
+  const isAuthenticated = useAppSelector(
+    (state) => state?.auth.isAuthenticated
+  );
+
+  const { pathname } = useRouterReady();
 
   useEffect(() => {
     if (isDarkMode) {
@@ -29,6 +36,13 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   // If user is not authenticated, show login page
   if (isAuthenticated === false) {
     console.log("User is not authenticated");
+    if (pathname === "/signup") {
+      return (
+        <div className={`${layoutClasses}`}>
+          <SignupPage />
+        </div>
+      );
+    }
     return (
       <div className={`${layoutClasses}`}>
         <LoginPage />

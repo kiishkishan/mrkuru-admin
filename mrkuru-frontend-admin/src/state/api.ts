@@ -7,6 +7,12 @@ export interface Login {
   password: string;
 }
 
+export interface LoginResponse {
+  token: string;
+  userName: string;
+  userImage: string;
+}
+
 // getProducts type
 export interface Products {
   productId: string;
@@ -137,7 +143,7 @@ export const api = createApi({
   tagTypes: ["DashboardMetrics", "Product", "ProductStatus", "Purchases"],
   endpoints: (build) => ({
     // Authentication
-    loginUser: build.mutation<{ token: string }, Login>({
+    loginUser: build.mutation<LoginResponse, Login>({
       query: (login: Login) => ({
         url: "auth/login",
         method: "POST",
