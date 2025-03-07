@@ -57,10 +57,10 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-      <div className="flex bg-white rounded-3xl shadow-xl overflow-hidden max-w-5xl w-full">
+    <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
+      <div className="flex flex-col md:flex-row bg-white rounded-3xl shadow-xl overflow-hidden w-full max-w-5xl">
         {/* Left Side (Form) */}
-        <div className="w-full md:w-1/2 py-16 px-12 bg-blue-50 text-blue-600">
+        <div className="w-full md:w-1/2 py-8 px-6 md:py-16 md:px-12 bg-blue-50 text-blue-600">
           <h2 className="text-2xl font-bold text-gray-800 mb-2">
             Welcome back
           </h2>
@@ -170,14 +170,17 @@ const LoginPage = () => {
         </div>
 
         {/* Right Side (Image) */}
-        <Image
-          src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/login.webp"
-          alt="Login Visual"
-          width={500}
-          height={250}
-          className="object-cover hidden md:block"
-          priority
-        />
+        <div className="hidden md:block md:w-1/2">
+          <Image
+            src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/login.webp"
+            alt="Login Visual"
+            width={500}
+            height={250}
+            className="object-cover w-full h-full"
+            quality={80}
+            priority
+          />
+        </div>
       </div>
     </div>
   );
