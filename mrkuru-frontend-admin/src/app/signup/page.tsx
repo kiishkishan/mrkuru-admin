@@ -51,7 +51,7 @@ const SignupPage = () => {
 
   const dispatch = useAppDispatch();
 
-  const [signUpUser] = useSignUpUserMutation();
+  const [signUpUser, { isLoading }] = useSignUpUserMutation();
 
   const {
     control,
@@ -336,7 +336,11 @@ const SignupPage = () => {
             <div>
               <button
                 type="submit"
-                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-base font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 transform w-full hover:scale-y-110 hover:scale-x-105y"
+                className={`${
+                  isLoading
+                    ? "bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600"
+                    : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+                } w-full px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Signing Up..." : "Sign Up"}
