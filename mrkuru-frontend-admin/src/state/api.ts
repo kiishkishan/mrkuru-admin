@@ -1,7 +1,6 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 // login type
-
 export interface Login {
   email: string;
   password: string;
@@ -9,8 +8,19 @@ export interface Login {
 
 export interface LoginResponse {
   token: string;
+  tokenExpiration: number;
   userName: string;
   userImage: string;
+}
+
+//signup type
+export interface Signup {
+  userId: string;
+  userName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  profileImage?: File;
 }
 
 // getProducts type
@@ -140,7 +150,13 @@ export const api = createApi({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
   }),
   reducerPath: "api",
-  tagTypes: ["DashboardMetrics", "Product", "ProductStatus", "Purchases"],
+  tagTypes: [
+    "Auth",
+    "DashboardMetrics",
+    "Product",
+    "ProductStatus",
+    "Purchases",
+  ],
   endpoints: (build) => ({
     // Authentication
     loginUser: build.mutation<LoginResponse, Login>({
@@ -149,6 +165,32 @@ export const api = createApi({
         method: "POST",
         body: login,
       }),
+      invalidatesTags: ["Auth"],
+    }),
+    signUpUser: build.mutation<Signup, Signup>({
+      query: (signup: Signup) => {
+        const formData = new FormData();
+
+        Object.entries(signup).forEach(([key, value]) => {
+          if (value instanceof File) {
+            formData.append(key, value); // Append file as is
+          } else {
+            formData.append(key, String(value)); // Convert non-file values to string
+          }
+        });
+
+        console.log(
+          Object.fromEntries(formData.entries()),
+          "formData append in query"
+        );
+
+        return {
+          url: "auth/signup",
+          method: "POST",
+          body: formData,
+        };
+      },
+      invalidatesTags: ["Auth"],
     }),
     // Dashboard
     getDashboardMetrics: build.query<DashboardMetrics, void>({
@@ -287,6 +329,7 @@ export const api = createApi({
 
 export const {
   useLoginUserMutation,
+  useSignUpUserMutation,
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
   useUploadImagetoS3Mutation,

@@ -67,7 +67,7 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
     try {
         console.log("File:", req.file);
         console.log("Body:", req.body);
-        const { name, price, rating, stockQuantity, details, productId, status } = req.body;
+        const { name, price, stockQuantity, details, productId, status } = req.body;
         if (!productId || !name || !price || !stockQuantity) {
             res.status(400).json({ error: "Missing required fields" });
             return;

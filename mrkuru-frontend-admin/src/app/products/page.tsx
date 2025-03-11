@@ -45,7 +45,6 @@ const Products = () => {
 
   const handleCreateProduct = async (productData: ProductFormData) => {
     try {
-      console.log("Product Data", productData.image);
       await createProduct(productData);
       setTimeout(() => {
         refetchProducts();

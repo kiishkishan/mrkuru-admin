@@ -1,23 +1,43 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useState } from "react";
-import { EyeIcon, EyeOffIcon } from "lucide-react";
+import { EyeIcon, EyeOffIcon, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid"; // Import UUID v4
 import useRouterReady from "@/app/(hooks)/useRouterReady";
+import { useAppDispatch } from "../redux";
+import { showToast } from "@/state/thunks/alertThunk";
+import { useSignUpUserMutation } from "@/state/api";
+
+type SignupFormData = {
+  userId: string;
+  userName: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+  profileImage?: File;
+};
 
 // Define form validation schema using Zod
 const signupSchema = z
   .object({
-    username: z.string().min(3, "Username must be at least 3 characters"),
+    userName: z
+      .string()
+      .min(3, "User Name must be at least 3 characters")
+      .max(12, "User Name must be at most 12 characters"),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
     confirmPassword: z.string(),
-    profileImage: z.instanceof(File).optional(),
+    profileImage: z
+      .custom<File>((file) => file instanceof File, {
+        message: "Profile image is required",
+      })
+      .refine((file) => file && file.type.startsWith("image/"), {
+        message: "Only image files are allowed",
+      }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -27,51 +47,45 @@ const signupSchema = z
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-  const [previewImage, setPreviewImage] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+  const dispatch = useAppDispatch();
+
+  const [signUpUser, { isLoading }] = useSignUpUserMutation();
 
   const {
+    control,
     handleSubmit,
     formState: { errors, isSubmitting },
-    control,
-  } = useForm({
+    reset,
+    setValue,
+  } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
   });
 
   const { router } = useRouterReady();
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (signupFormData: SignupFormData) => {
     try {
       // Generate UUID v4 for userId
       const userId = uuidv4();
+      const submitFormData = { ...signupFormData, userId };
+      setImagePreview(null);
 
       // Prepare form data for submission
-      const formData = new FormData();
-      formData.append("userId", userId);
-      formData.append("username", data.username);
-      formData.append("email", data.email);
-      formData.append("password", data.password);
-      if (data.profileImage) {
-        formData.append("profileImage", data.profileImage);
+      console.log("Signup form data:", submitFormData);
+      const response = await signUpUser(submitFormData).unwrap();
+
+      if (response) {
+        reset();
+        dispatch(showToast("Signup successful", "success"));
+        setTimeout(() => {
+          router.push("/login");
+        }, 1000);
       }
-
-      // Submit data to the API
-      const response = await fetch("/api/signup", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error("Signup failed");
-      }
-
-      const result = await response.json();
-      console.log("Signup successful:", result);
-
-      // Redirect or show success message
-      alert("Signup successful!");
     } catch (error) {
       console.error("Signup error:", error);
-      alert("Signup failed. Please try again.");
+      dispatch(showToast("Signup failed. Please try again.", "error"));
     }
   };
 
@@ -80,10 +94,15 @@ const SignupPage = () => {
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
+        setImagePreview(reader.result as string);
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setValue("profileImage", null as unknown as File);
   };
 
   return (
@@ -108,22 +127,22 @@ const SignupPage = () => {
                 Username
               </label>
               <Controller
-                name="username"
+                name="userName"
                 control={control}
                 defaultValue=""
                 render={({ field }) => (
                   <input
                     {...field}
-                    id="username"
+                    id="userName"
                     type="text"
                     className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                     placeholder="Enter your username"
                   />
                 )}
               />
-              {errors?.username && (
+              {errors?.userName && (
                 <p className="mt-1 text-sm text-red-500">
-                  {errors.username.message?.toString()}
+                  {errors.userName.message?.toString()}
                 </p>
               )}
             </div>
@@ -249,51 +268,79 @@ const SignupPage = () => {
                 htmlFor="profileImage"
                 className="block text-sm font-medium text-gray-700"
               >
-                Profile Image (Optional)
+                Profile Image
               </label>
-              <Controller
-                name="profileImage"
-                control={control}
-                render={({ field }) => (
-                  <div>
-                    <input
-                      id="profileImage"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={(e) => {
-                        field.onChange(e.target.files?.[0]);
-                        handleImageChange(e);
-                      }}
-                    />
+              <div className="mt-1 flex justify-center px-4 pt-4 pb-4 border-2 border-gray-300 border-dashed rounded-md">
+                <div className="space-y-1 text-center">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <Image
+                        src={imagePreview}
+                        alt="Preview"
+                        width={96}
+                        height={96}
+                        priority
+                        quality={40}
+                        className="object-cover rounded-md mx-auto"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute top-0 right-3 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ) : (
+                    <Upload className="mx-auto h-8 w-8 text-gray-400" />
+                  )}
+                  <div className="flex text-sm text-gray-600">
                     <label
-                      htmlFor="profileImage"
-                      className="mt-1 flex items-center justify-center w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm cursor-pointer hover:bg-gray-50"
+                      htmlFor="file-upload"
+                      className="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500"
                     >
-                      {previewImage ? (
-                        <Image
-                          src={previewImage}
-                          alt="Profile Preview"
-                          width={80}
-                          height={80}
-                          className="rounded-full object-cover"
-                        />
-                      ) : (
-                        <span className="text-sm text-gray-500">
-                          Upload Profile Image
-                        </span>
-                      )}
+                      <span>Upload a file</span>
+                      <Controller
+                        name="profileImage"
+                        control={control}
+                        render={({ field }) => (
+                          <input
+                            id="file-upload"
+                            type="file"
+                            accept="image/*"
+                            className="sr-only"
+                            onChange={(e) => {
+                              console.log("produtImage", e.target.files);
+                              field.onChange(e.target.files?.[0]);
+                              handleImageChange(e);
+                            }}
+                          />
+                        )}
+                      />
                     </label>
+                    <p className="pl-1">or drag and drop</p>
                   </div>
-                )}
-              />
+                  <p className="text-xs text-gray-500">
+                    PNG, JPG, WEBP up to 10MB
+                  </p>
+                </div>
+              </div>
+              {errors.profileImage && (
+                <p className="text-red-500 text-xs mt-1">
+                  {errors.profileImage.message}
+                </p>
+              )}
             </div>
 
             {/* Submit Button */}
             <div>
               <button
                 type="submit"
-                className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600 text-white text-base font-bold py-3 px-6 rounded-lg shadow-md transition-all duration-300 transform w-full hover:scale-y-110 hover:scale-x-105y"
+                className={`${
+                  isLoading
+                    ? "bg-gradient-to-r from-gray-600 to-gray-500 hover:from-gray-700 hover:to-gray-600"
+                    : "bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-700 hover:to-blue-600"
+                } w-full px-4 py-2 text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
                 disabled={isSubmitting}
               >
                 {isSubmitting ? "Signing Up..." : "Sign Up"}
@@ -324,6 +371,7 @@ const SignupPage = () => {
           height={250}
           className="object-cover w-full h-full"
           priority
+          quality={80}
         />
       </div>
     </div>

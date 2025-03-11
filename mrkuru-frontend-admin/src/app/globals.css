@@ -17,9 +17,15 @@ html,body,#root,.app {
 input,
 textarea,
 select {
-  @apply text-base sm:text-sm;
+  @apply text-base;
 }
 
+@supports (-webkit-touch-callout: none) {
+  input, textarea, select {
+    font-size: 16px !important;
+  }
+}
+  
 /* Custom Grid Rows Start - Customized Tailwind Class in Dashboard for designated Viewport */
 @media (min-width: 768px) {
   .custom-grid-rows {
