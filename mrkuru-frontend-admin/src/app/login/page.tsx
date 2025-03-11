@@ -47,6 +47,7 @@ const LoginPage = () => {
           setAuth({
             isAuthenticated: !isAuthenticated,
             token: response.token,
+            tokenExpiration: response.tokenExpiration,
             userName: response.userName,
             userImage: response.userImage,
           })
@@ -197,6 +198,8 @@ const LoginPage = () => {
           height={250}
           className="object-cover w-full h-full"
           priority
+          quality={80}
+          loading="eager"
         />
       </div>
     </div>
