@@ -52,17 +52,16 @@ export const loginUser = async (req: Request, res: Response) => {
       { id: user.userId, userName: user.name },
       process.env.JWT_SECRET,
       {
-        expiresIn: "1m",
+        expiresIn: "15m",
       }
     );
 
-    const tokenExpiration = Date.now() + 60 * 1000;
+    const { password: userPassword, ...userDetails } = user;
 
     res.status(201).json({
+      message: "User logged in successfully",
       token,
-      tokenExpiration,
-      userName: user.name,
-      userImage: user.profileImage,
+      user: userDetails,
     });
   } catch (error) {
     console.error("Error logging in:", error);

@@ -1,4 +1,3 @@
-// hooks/useRouterData.ts
 "use client";
 
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
