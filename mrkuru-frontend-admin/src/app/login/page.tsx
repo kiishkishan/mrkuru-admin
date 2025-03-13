@@ -42,14 +42,14 @@ const LoginPage = () => {
     try {
       const response = await loginUser(data).unwrap();
       if (response.token) {
+        console.log(response?.user.name, "login response");
         dispatch(showToast("Login successful", "success"));
         dispatch(
           setAuth({
             isAuthenticated: !isAuthenticated,
             token: response.token,
-            tokenExpiration: response.tokenExpiration,
-            userName: response.userName,
-            userImage: response.userImage,
+            userName: response?.user.name,
+            userImage: response?.user.profileImage,
           })
         );
         router.push("/dashboard");

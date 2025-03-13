@@ -4,6 +4,15 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import sharp from "sharp";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+const nodemailer = require("nodemailer");
+
+const transporter = nodemailer.createTransport({
+  service: "gmail",
+  auth: {
+    user: process.env.EMAIL_USER!,
+    pass: process.env.EMAIL_PASS!,
+  },
+});
 
 const prisma = new PrismaClient();
 
@@ -126,6 +135,26 @@ export const signUpUser = async (
         password: await bcrypt.hash(password, 10),
         profileImage: imageUrl,
       },
+    });
+
+    // Send welcome email
+    const mailOptions = {
+      from: process.env.EMAIL_USER!,
+      to: email,
+      subject: "Welcome to Our Platform!",
+      html: `
+        <h1>Welcome, ${userName}!</h1>
+        <p>We're excited to have you on board. Start exploring and enjoy your journey with us.</p>
+        <p>If you have any questions, feel free to contact us.</p>
+      `,
+    };
+
+    transporter.sendMail(mailOptions, (err: any, info: { response: any }) => {
+      if (err) {
+        console.error("Error sending email:", err);
+      } else {
+        console.log("Email sent:", info.response);
+      }
     });
 
     res.json({

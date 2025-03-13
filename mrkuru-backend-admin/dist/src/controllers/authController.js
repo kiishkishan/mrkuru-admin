@@ -29,6 +29,14 @@ const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const sharp_1 = __importDefault(require("sharp"));
 const client_s3_1 = require("@aws-sdk/client-s3");
+const nodemailer = require("nodemailer");
+const transporter = nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+    },
+});
 const prisma = new client_1.PrismaClient();
 // Configure the S3 client
 const s3 = new client_s3_1.S3Client({
@@ -123,6 +131,25 @@ const signUpUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
                 password: yield bcryptjs_1.default.hash(password, 10),
                 profileImage: imageUrl,
             },
+        });
+        // Send welcome email
+        const mailOptions = {
+            from: process.env.EMAIL_USER,
+            to: email,
+            subject: "Welcome to Our Platform!",
+            html: `
+        <h1>Welcome, ${userName}!</h1>
+        <p>We're excited to have you on board. Start exploring and enjoy your journey with us.</p>
+        <p>If you have any questions, feel free to contact us.</p>
+      `,
+        };
+        transporter.sendMail(mailOptions, (err, info) => {
+            if (err) {
+                console.error("Error sending email:", err);
+            }
+            else {
+                console.log("Email sent:", info.response);
+            }
         });
         res.json({
             message: "Product created successfully",

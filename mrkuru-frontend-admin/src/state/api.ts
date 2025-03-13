@@ -10,8 +10,10 @@ export interface Login {
 export interface LoginResponse {
   token: string;
   tokenExpiration: number;
-  userName: string;
-  userImage: string;
+  user: {
+    name: string;
+    profileImage: string;
+  };
 }
 
 //signup type
