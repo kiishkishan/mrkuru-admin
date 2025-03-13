@@ -3,12 +3,10 @@
 import React, { useEffect } from "react";
 import Navbar from "@/app/(components)/Navbar";
 import Sidebar from "@/app/(components)/Sidebar";
-import StoreProvider, { useAppDispatch, useAppSelector } from "./redux";
+import StoreProvider, { useAppSelector } from "./redux";
 import LoginPage from "@/app/login/page";
 import useRouterReady from "@/app/(hooks)/useRouterReady";
 import SignupPage from "@/app/signup/page";
-import { startTokenExpirationCheck } from "@/state/slices/authSlice";
-// import SignupPage from "./signup/page";
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   const isSidebarCollapsed = useAppSelector(
@@ -21,12 +19,6 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   );
 
   const { pathname } = useRouterReady();
-
-  const dispatch = useAppDispatch();
-
-  useEffect(() => {
-    dispatch(startTokenExpirationCheck());
-  }, [dispatch]);
 
   useEffect(() => {
     if (isDarkMode) {

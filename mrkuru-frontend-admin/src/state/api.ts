@@ -1,4 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import { jwtDecode } from "jwt-decode";
 
 // login type
 export interface Login {
@@ -9,8 +10,10 @@ export interface Login {
 export interface LoginResponse {
   token: string;
   tokenExpiration: number;
-  userName: string;
-  userImage: string;
+  user: {
+    name: string;
+    profileImage: string;
+  };
 }
 
 //signup type
@@ -145,9 +148,40 @@ export interface DashboardMetrics {
   expenseByCategorySummary: ExpenseByCategorySummary[];
 }
 
+// jwt typesafety
+interface JwtPayload {
+  id: string;
+  userName: string;
+  iat: number;
+  exp: number;
+}
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+    prepareHeaders: (headers, { endpoint }) => {
+      const token = sessionStorage.getItem("token"); // Get token
+
+      // Exclude token for login and signup requests
+      if (token && endpoint !== "auth/login" && endpoint !== "auth/signup") {
+        try {
+          // Decode token
+          const decodedToken = jwtDecode<JwtPayload>(token);
+
+          // Check if token is expired
+          if (decodedToken.exp * 1000 < Date.now()) {
+            sessionStorage.removeItem("token"); // Remove token from session storage
+            window.location.href = "/login"; // Redirect to login page
+          }
+
+          headers.set("Authorization", `Bearer ${token}`);
+        } catch (error) {
+          console.log("Error decoding token: ", error);
+        }
+      }
+
+      return headers;
+    },
   }),
   reducerPath: "api",
   tagTypes: [

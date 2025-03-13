@@ -1,10 +1,8 @@
-import { AppDispatch } from "@/app/redux";
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface AuthState {
   isAuthenticated: boolean;
   token: string | null;
-  tokenExpiration?: number | null;
   userName: string | null;
   userImage: string | null;
 }
@@ -16,10 +14,6 @@ const initialState: AuthState = {
     typeof window !== "undefined"
       ? window.sessionStorage.getItem("token")
       : null, // Load token from session storage
-  tokenExpiration:
-    typeof window !== "undefined"
-      ? Number(window.sessionStorage.getItem("tokenExpiration"))
-      : null,
   userName: null,
   userImage: null,
 };
@@ -33,7 +27,6 @@ export const authSlice = createSlice({
       action: PayloadAction<{
         isAuthenticated: boolean;
         token: string | null;
-        tokenExpiration?: number | null;
         userName?: string | null;
         userImage?: string | null;
       }>
@@ -45,12 +38,6 @@ export const authSlice = createSlice({
 
       if (action.payload.token) {
         window.sessionStorage.setItem("token", action.payload.token);
-        if (action.payload.tokenExpiration) {
-          window.sessionStorage.setItem(
-            "tokenExpiration",
-            action.payload.tokenExpiration.toString()
-          );
-        }
       } else {
         window.sessionStorage.removeItem("token");
       }
@@ -59,34 +46,14 @@ export const authSlice = createSlice({
     logoutUser: (state) => {
       state.isAuthenticated = false;
       state.token = null;
-      state.tokenExpiration = null;
       state.userName = null;
       state.userImage = null;
       window.sessionStorage.removeItem("token");
-      window.sessionStorage.removeItem("tokenExpiration");
-    },
-
-    checkTokenExpiration: (state) => {
-      if (state.tokenExpiration && Date.now() > state.tokenExpiration) {
-        state.isAuthenticated = false;
-        state.token = null;
-        state.tokenExpiration = null;
-        state.userName = null;
-        state.userImage = null;
-        window.sessionStorage.removeItem("token");
-        window.sessionStorage.removeItem("tokenExpiration");
-      }
+      window.location.href = "/";
     },
   },
 });
 
-export const { setAuth, logoutUser, checkTokenExpiration } = authSlice.actions;
-
-// Periodically check token expiration
-export const startTokenExpirationCheck = () => (dispatch: AppDispatch) => {
-  setInterval(() => {
-    dispatch(checkTokenExpiration());
-  }, 1000); // Check every second
-};
+export const { setAuth, logoutUser } = authSlice.actions;
 
 export default authSlice.reducer;

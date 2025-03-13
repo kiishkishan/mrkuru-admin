@@ -9,9 +9,11 @@ import {
   deletePurchaseStatus,
   updatePurchaseStatus,
 } from "../controllers/purchaseController";
-import { loginUser } from "../controllers/authController";
+import { isAuth } from "../middleware/isAuth";
 
 const router = Router();
+
+router.use(isAuth);
 
 router.get("/suppliers", getSuppliers);
 router.post("/suppliers", createSuppliers);
