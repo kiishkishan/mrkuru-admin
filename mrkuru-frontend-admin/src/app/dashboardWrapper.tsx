@@ -18,7 +18,14 @@ const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
     (state) => state?.auth.isAuthenticated
   );
 
-  const { pathname } = useRouterReady();
+  const { pathname, router } = useRouterReady();
+
+  // Redirect authenticated users away from login/signup
+  useEffect(() => {
+    if (isAuthenticated && (pathname === "/login" || pathname === "/signup")) {
+      router.replace("/"); // Redirect to dashboard or any other page
+    }
+  }, [isAuthenticated, pathname, router]);
 
   useEffect(() => {
     if (isDarkMode) {

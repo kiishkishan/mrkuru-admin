@@ -72,7 +72,7 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const token = jsonwebtoken_1.default.sign({ id: user.userId, userName: user.name }, process.env.JWT_SECRET, {
-            expiresIn: "15m",
+            expiresIn: "1m",
         });
         const { password: userPassword } = user, userDetails = __rest(user, ["password"]);
         res.status(201).json({
@@ -94,6 +94,15 @@ const signUpUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const { userId, userName, email, password, confirmPassword } = req.body;
         if (!userId || !userName || !email || !password || !confirmPassword) {
             res.status(400).json({ error: "Missing required fields" });
+            return;
+        }
+        // Check if user exist
+        const user = yield prisma.users.findUnique({
+            where: { email },
+        });
+        console.log(user, "User");
+        if (user) {
+            res.status(400).json({ error: "User already exists" });
             return;
         }
         if (password !== confirmPassword) {
@@ -136,11 +145,21 @@ const signUpUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
         const mailOptions = {
             from: process.env.EMAIL_USER,
             to: email,
-            subject: "Welcome to Our Platform!",
+            subject: `🎉 Welcome to Our Platform, ${userName}! 🚀`,
             html: `
-        <h1>Welcome, ${userName}!</h1>
-        <p>We're excited to have you on board. Start exploring and enjoy your journey with us.</p>
-        <p>If you have any questions, feel free to contact us.</p>
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px; text-align: center; box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);">
+          <h1 style="color: #4CAF50;">Welcome to Our Portal, ${userName}! 🎊</h1>
+          <p style="font-size: 16px; color: #333;">We're absolutely thrilled to have you onboard! 🌟</p>
+          <img src="https://media.giphy.com/media/hvRJCLFzcasrR4ia7z/giphy.gif" alt="Welcome GIF" width="100" />
+          <p style="font-size: 14px; color: #555; margin-top: 10px;">
+            🚀 Get ready to explore amazing features and unlock exciting opportunities.<br />
+            Need help? Our team is here for you. Don't hesitate to <a href="mailto:mrkuru07@gmail.com" style="color: #4CAF50; text-decoration: none;">reach out</a>. 💡
+          </p>
+          <div style="margin-top: 20px;">
+            <a href="https://mrkuru-admin-frontend-rho.vercel.app//dashboard" style="background-color: #4CAF50; color: white; padding: 12px 20px; text-decoration: none; border-radius: 5px; font-size: 16px; display: inline-block;">Go to Dashboard</a>
+          </div>
+          <p style="font-size: 12px; color: #777; margin-top: 20px;">Happy Exploring!<br/>- The Team 🚀</p>
+        </div>
       `,
         };
         transporter.sendMail(mailOptions, (err, info) => {

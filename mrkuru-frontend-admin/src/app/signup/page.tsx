@@ -3,12 +3,12 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EyeIcon, EyeOffIcon, Upload, X } from "lucide-react";
 import Image from "next/image";
 import { v4 as uuidv4 } from "uuid"; // Import UUID v4
 import useRouterReady from "@/app/(hooks)/useRouterReady";
-import { useAppDispatch } from "../redux";
+import { useAppDispatch, useAppSelector } from "../redux";
 import { showToast } from "@/state/thunks/alertThunk";
 import { useSignUpUserMutation } from "@/state/api";
 
@@ -52,6 +52,7 @@ const SignupPage = () => {
   const dispatch = useAppDispatch();
 
   const [signUpUser, { isLoading }] = useSignUpUserMutation();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
 
   const {
     control,
@@ -64,6 +65,13 @@ const SignupPage = () => {
   });
 
   const { router } = useRouterReady();
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("User is authenticated");
+      router.push("/dashboard");
+    }
+  }, [router, isAuthenticated, dispatch]);
 
   const onSubmit = async (signupFormData: SignupFormData) => {
     try {
