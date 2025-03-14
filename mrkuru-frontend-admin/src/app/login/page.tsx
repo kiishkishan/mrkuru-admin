@@ -8,7 +8,7 @@ import { useAppDispatch, useAppSelector } from "../redux";
 import { showToast } from "@/state/thunks/alertThunk";
 import Image from "next/image";
 import { useLoginUserMutation } from "@/state/api";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { setAuth } from "@/state/slices/authSlice";
 import useRouterReady from "@/app/(hooks)/useRouterReady";
@@ -37,6 +37,13 @@ const LoginPage = () => {
   const { router } = useRouterReady();
 
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      console.log("User is authenticated");
+      router.push("/dashboard");
+    }
+  }, [router, isAuthenticated, dispatch]);
 
   const onSubmit = async (data: any) => {
     try {

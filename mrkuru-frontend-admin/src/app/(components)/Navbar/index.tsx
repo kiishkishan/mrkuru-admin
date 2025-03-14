@@ -84,7 +84,7 @@ const Navbar = () => {
               />
             ) : (
               <Image
-                src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/profile.webp"
+                src="https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/dummy_profile.webp"
                 alt="Profile"
                 width={25}
                 height={25}
@@ -95,7 +95,7 @@ const Navbar = () => {
             {userName ? (
               <span className="font-semibold hidden md:flex">{userName}</span>
             ) : (
-              <span className="font-semibold hidden md:flex">Kishanth</span>
+              <span className="font-semibold hidden md:flex">User</span>
             )}
           </div>
           <LogOut
