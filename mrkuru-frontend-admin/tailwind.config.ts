@@ -67,6 +67,10 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      screens: {
+        "2xl": "1920px", // Adjust 2xl to start at 1920px instead of 1536px
+        "3xl": "2560px",
+      },
     },
   },
   plugins: [createThemes(themes)],

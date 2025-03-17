@@ -13,6 +13,7 @@ import PurchaseOrderDocument from "@/app/purchases/(purchases)/purchaseOrderDocu
 import { usePDF } from "@react-pdf/renderer";
 import PurchaseOrderModal from "./purchaseOrderModal";
 import PurchaseStatusChangeModal from "./purchaseStatusChangeModal";
+import useRouterReady from "@/app/(hooks)/useRouterReady";
 
 const PurchasesDataGrid = () => {
   const { data: purchases, isLoading, isError } = useGetPurchasesQuery();
@@ -26,6 +27,8 @@ const PurchasesDataGrid = () => {
   const [selectedPurchase, setSelectedPurchase] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isChangeStatusModalOpen, setIsChangeStatusModalOpen] = useState(false);
+
+  const { router } = useRouterReady();
 
   // PDF
   const [instance, update] = usePDF({
@@ -221,7 +224,10 @@ const PurchasesDataGrid = () => {
         <p className="text-base font-semibold text-gray-700">
           List of Purchases
         </p>
-        <CreateButton name="Create Purchase" />
+        <CreateButton
+          name="Create Purchase"
+          onClickCreate={() => router.push("/purchases/create")}
+        />
       </div>
       <ThemeProvider theme={theme}>
         <DataGrid
