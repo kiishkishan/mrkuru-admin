@@ -28,6 +28,7 @@ import {
 } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
+import AuthProvider from "./authProvider";
 
 /* REDUX PERSISTENCE */
 const createNoopStorage = () => {
@@ -108,6 +109,7 @@ export default function StoreProvider({
 
   return (
     <Provider store={storeRef.current}>
+      <AuthProvider />
       <PersistGate loading={null} persistor={persistor}>
         {children}
       </PersistGate>

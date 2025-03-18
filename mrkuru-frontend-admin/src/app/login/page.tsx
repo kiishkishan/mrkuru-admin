@@ -48,13 +48,14 @@ const LoginPage = () => {
   const onSubmit = async (data: any) => {
     try {
       const response = await loginUser(data).unwrap();
-      if (response.token) {
+      console.log("loginUser response", response);
+      if (response.accessToken) {
         console.log(response?.user.name, "login response");
         dispatch(showToast("Login successful", "success"));
         dispatch(
           setAuth({
             isAuthenticated: !isAuthenticated,
-            token: response.token,
+            accessToken: response.accessToken,
             userName: response?.user.name,
             userImage: response?.user.profileImage,
           })

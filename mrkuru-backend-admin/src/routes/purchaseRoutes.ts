@@ -9,11 +9,11 @@ import {
   deletePurchaseStatus,
   updatePurchaseStatus,
 } from "../controllers/purchaseController";
-import { isAuth } from "../middleware/isAuth";
+import { isAuthVerifyToken } from "../middleware/isAuth";
 
 const router = Router();
 
-router.use(isAuth);
+router.use(isAuthVerifyToken);
 
 router.get("/suppliers", getSuppliers);
 router.post("/suppliers", createSuppliers);

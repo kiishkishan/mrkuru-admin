@@ -1,10 +1,10 @@
 import { Router } from "express";
 import { getDashboardMetrics } from "../controllers/dashboardController";
-import { isAuth } from "../middleware/isAuth";
+import { isAuthVerifyToken } from "../middleware/isAuth";
 
 const router = Router();
 
-router.use(isAuth);
+router.use(isAuthVerifyToken);
 
 router.get("/metrics", getDashboardMetrics); // http://localhost:3000/dashboard/metrics
 

@@ -2,7 +2,7 @@
 
 import { usePathname, useSearchParams, useRouter } from "next/navigation";
 
-const useRouterData = () => {
+const useRouterReady = () => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -14,4 +14,4 @@ const useRouterData = () => {
   };
 };
 
-export default useRouterData;
+export default useRouterReady;

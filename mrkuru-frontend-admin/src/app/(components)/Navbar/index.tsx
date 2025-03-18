@@ -1,10 +1,12 @@
 "use client";
 import { useAppDispatch, useAppSelector } from "@/app/redux";
 import { setIsDarkMode, setIsSidebarCollapsed } from "@/state";
+import { useLogoutMutation } from "@/state/api";
 import { logoutUser } from "@/state/slices/authSlice";
+import { showToast } from "@/state/thunks/alertThunk";
 import { Bell, LogOut, Menu, Moon, Sun } from "lucide-react";
 import Image from "next/image";
-import React from "react";
+import React, { memo } from "react";
 
 const Navbar = () => {
   const dispatch = useAppDispatch();
@@ -15,7 +17,7 @@ const Navbar = () => {
   const isDarkMode = useAppSelector((state) => state?.global.isDarkMode);
   const { userName, userImage } = useAppSelector((state) => state.auth);
 
-  // const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const [logOut] = useLogoutMutation();
 
   const toggleSidebar = () => {
     dispatch(setIsSidebarCollapsed(!isSidebarCollapsed));
@@ -25,8 +27,16 @@ const Navbar = () => {
     dispatch(setIsDarkMode(!isDarkMode));
   };
 
-  const toggleLogout = () => {
-    dispatch(logoutUser());
+  const toggleLogout = async () => {
+    try {
+      const response = await logOut().unwrap();
+      console.log("response logout", response);
+      dispatch(logoutUser());
+      dispatch(showToast("Logged out successfully", "success"));
+    } catch (error) {
+      console.error("Logout failed:", error);
+      dispatch(showToast("Logout failed", "error"));
+    }
   };
 
   return (
@@ -109,4 +119,4 @@ const Navbar = () => {
   );
 };
 
-export default Navbar;
+export default memo(Navbar);

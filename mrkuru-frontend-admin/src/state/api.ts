@@ -1,5 +1,5 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
-import { jwtDecode } from "jwt-decode";
+import { RootState } from "@/app/redux"; // Adjust the path to your Redux store file
 
 // login type
 export interface Login {
@@ -8,7 +8,7 @@ export interface Login {
 }
 
 export interface LoginResponse {
-  token: string;
+  accessToken: string;
   tokenExpiration: number;
   user: {
     name: string;
@@ -149,38 +149,23 @@ export interface DashboardMetrics {
 }
 
 // jwt typesafety
-interface JwtPayload {
-  id: string;
-  userName: string;
-  iat: number;
-  exp: number;
-}
+// interface JwtPayload {
+//   id: string;
+//   userName: string;
+//   iat: number;
+//   exp: number;
+// }
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
-    prepareHeaders: (headers, { endpoint }) => {
-      const token = sessionStorage.getItem("token"); // Get token
+    prepareHeaders: (headers, { getState }) => {
+      const state = getState() as RootState; // Adjust based on your state structure
+      const token = state.auth?.accessToken;
 
-      // Exclude token for login and signup requests
-      if (token && endpoint !== "auth/login" && endpoint !== "auth/signup") {
-        try {
-          // Decode token
-          const decodedToken = jwtDecode<JwtPayload>(token);
+      console.log("prepareHeaders token", token);
 
-          // Check if token is expired
-          if (decodedToken.exp * 1000 < Date.now()) {
-            sessionStorage.removeItem("token"); // Remove token from session storage
-            window.location.href = "/login"; // Redirect to login page
-          }
-
-          headers.set("Authorization", `Bearer ${token}`);
-        } catch (error) {
-          console.log("Error decoding token: ", error);
-        }
-      }
-
-      return headers;
+      headers.set("Authorization", `Bearer ${token}`);
     },
   }),
   reducerPath: "api",
@@ -201,6 +186,20 @@ export const api = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
+    refreshToken: build.mutation<{ accessToken: string }, void>({
+      query: () => ({
+        url: "/auth/refresh",
+        method: "POST", // Use POST if your backend expects it
+      }),
+    }),
+
+    logout: build.mutation<void, void>({
+      query: () => ({
+        url: "/auth/logout",
+        method: "POST",
+      }),
+    }),
+
     signUpUser: build.mutation<Signup, Signup>({
       query: (signup: Signup) => {
         const formData = new FormData();
@@ -363,6 +362,8 @@ export const api = createApi({
 
 export const {
   useLoginUserMutation,
+  useRefreshTokenMutation,
+  useLogoutMutation,
   useSignUpUserMutation,
   useGetDashboardMetricsQuery,
   useGetProductsQuery,
