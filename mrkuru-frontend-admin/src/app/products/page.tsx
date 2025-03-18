@@ -1,109 +1,132 @@
 "use client";
 
 import { useState } from "react";
-import Header from "@/app/(components)/Header";
-import CreateProductForm from "@/app/products/createProductForm";
-import ProductCard from "@/app/(components)/ProductCard";
-import useGetProducts from "@/app/(hooks)/getProducts";
-import ProductCardSkeleton from "@/app/(components)/Skeleton/productCardSkeleton";
-import { useCreateProductMutation } from "@/state/api";
-import CreateButton from "@/app/(components)/Button/createButton";
-import { showToast } from "@/state/thunks/alertThunk";
-import { useAppDispatch } from "@/app/redux";
-import SearchBar from "@/app/(components)/SearchBar";
+import Image from "next/image";
+import Rating from "@/app/(components)/Rating";
 
-type ProductFormData = {
-  name: string;
-  price: number;
-  stockQuantity: number;
-  details: string;
-  image: File;
-  productId?: string;
-  status?: string;
-};
-
-type Products = {
+type Product = {
   productId: string;
   name: string;
   price: number;
-  rating?: number;
   stockQuantity: number;
-  details: string;
+  rating?: number;
+  details?: string;
   imageUrl: string;
 };
 
-const Products = () => {
-  const [searchTerm, setSearchTerm] = useState<string>("");
-  const [isCreateAreaOpen, setIsCreateAreaOpen] = useState<boolean>(false);
+interface ProductCardProps {
+  product: Product;
+  miniCard?: boolean;
+}
 
-  const { products, isLoading, isError, refetchProducts } =
-    useGetProducts(searchTerm);
+const ProductCard = ({ product, miniCard }: ProductCardProps) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+  const [isSelected, setIsSelected] = useState(false);
+  const fallbackImage =
+    "https://s3-mrkuru-inventorycmspos.s3.us-east-1.amazonaws.com/no_product_img_found.webp";
 
-  const [createProduct] = useCreateProductMutation();
-
-  const dispatch = useAppDispatch();
-
-  const handleCreateProduct = async (productData: ProductFormData) => {
-    try {
-      await createProduct(productData);
-      setTimeout(() => {
-        refetchProducts();
-      }, 1000);
-      setIsCreateAreaOpen(false);
-      dispatch(showToast("Product created successfully!", "success"));
-    } catch (error) {
-      console.error("Failed to create product", error);
-      // Show an error toast
-      dispatch(
-        showToast("Failed to create product. Please try again.", "error")
-      );
-    }
+  const toggleSelection = () => {
+    setIsSelected((prev) => !prev);
   };
 
-  const toggleCreateArea = () => setIsCreateAreaOpen((prev) => !prev);
-
-  if (isError && !isLoading) {
-    return (
-      <div className="py-4 text-red-500 text-center text-lg font-bold">
-        Failed to fetch products
-      </div>
-    );
-  }
-
   return (
-    <div className="mx-auto pb-5 w-full">
-      {/* SEARCH BAR */}
-      <div className="mb-6">
-        <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
-      </div>
-
-      {/* HEADER BAR */}
-      <div className="flex justify-between items-center mb-6">
-        <Header name="Products" />
-        <CreateButton name="Create Product" onClickCreate={toggleCreateArea} />
-      </div>
-
-      {/* CREATE PRODUCT AREA */}
-      {isCreateAreaOpen && <CreateProductForm onCreate={handleCreateProduct} />}
-
-      {/* PRODUCT LIST */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-10 justify-between">
-        {isLoading
-          ? Array.from({ length: 6 }).map((_, index) => (
-              <ProductCardSkeleton key={index} />
-            ))
-          : products?.map((product) => (
-              <ProductCard key={product.productId} product={product} />
-            ))}
-      </div>
-
-      {!isLoading && products?.length === 0 && (
-        <div className="text-center text-gray-500 py-8">
-          No products found {searchTerm && `for "${searchTerm}"`}
-        </div>
+    <div
+      className={`relative border border-gray-100 cursor-pointer transition-all duration-300 ease-out will-change-transform
+        ${
+          miniCard
+            ? "shadow-md hover:shadow-lg rounded-md p-4"
+            : "shadow-lg hover:shadow-xl rounded-xl p-6"
+        } 
+        bg-white hover:bg-gray-50 hover:scale-[1.02] hover:border-emerald-500 
+        ${isSelected ? "border-emerald-500 shadow-lg" : ""}`}
+      onClick={toggleSelection}
+    >
+      {/* MiniCard Selection Overlay */}
+      {miniCard && isSelected && (
+        <div className="absolute inset-0 bg-white bg-opacity-50 rounded-md"></div>
       )}
+
+      <div className="flex flex-col items-center relative">
+        <div
+          className={`relative mb-4 rounded-xl overflow-hidden aspect-square bg-gray-100
+            ${miniCard ? "w-24 h-24" : "w-36 h-36"}`}
+        >
+          <Image
+            src={product?.imageUrl || fallbackImage}
+            alt={product?.name}
+            fill
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            className={`rounded-xl object-cover transition-opacity duration-300 ${
+              imageLoaded ? "opacity-100" : "opacity-0"
+            }`}
+            quality={miniCard ? 60 : 80}
+            priority
+            onLoad={() => setImageLoaded(true)}
+            onError={(e) => {
+              (e.target as HTMLImageElement).src = fallbackImage;
+            }}
+          />
+        </div>
+
+        <h3
+          className={`text-xl text-gray-900 font-bold mb-1 text-center ${
+            miniCard ? "break-words h-24 mt-2" : ""
+          }`}
+        >
+          {miniCard && product?.name.length > 50
+            ? `${product.name.substring(0, 50)}...`
+            : product.name}
+        </h3>
+
+        <p className="text-2xl font-semibold text-emerald-600 mb-2">
+          {product?.price.toFixed(2)} LKR
+        </p>
+
+        <div
+          className={`px-3 py-1 rounded-full text-sm font-medium mb-3 ${
+            product?.stockQuantity > 0
+              ? "bg-gray-100 text-gray-700"
+              : "bg-red-100 text-red-700"
+          }`}
+        >
+          {product?.stockQuantity} in stock
+        </div>
+
+        {product?.rating && !miniCard && (
+          <div className="flex items-center mb-4">
+            <Rating rating={product?.rating} />
+            <span className="ml-2 text-sm text-gray-600">
+              ({product.rating})
+            </span>
+          </div>
+        )}
+
+        {product?.details && !miniCard && (
+          <div className="w-full">
+            <div className="text-sm text-gray-600 line-clamp-3 transition-all">
+              {product.details.length > 100
+                ? `${product.details.substring(0, 100)}...`
+                : product.details}
+            </div>
+          </div>
+        )}
+
+        {miniCard && (
+          <div className="absolute top-2 left-2 flex items-center gap-2 z-10">
+            <input
+              type="checkbox"
+              checked={isSelected}
+              readOnly
+              className="appearance-none w-5 h-5 border-2 border-emerald-600 rounded-md checked:bg-emerald-600 checked:border-transparent focus:ring-2 focus:ring-emerald-500 transition-all cursor-pointer"
+            />
+            <span className="text-sm font-medium text-gray-900">
+              {isSelected ? "Selected" : "Select"}
+            </span>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default Products;
+export default ProductCard;
