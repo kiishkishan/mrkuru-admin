@@ -81,10 +81,10 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const accessToken = jsonwebtoken_1.default.sign({ id: user.userId, userName: user.name }, process.env.JWT_SECRET, {
-            expiresIn: "15m",
+            expiresIn: "2min",
         });
-        const refreshToken = jsonwebtoken_1.default.sign({ userId: user.userId }, process.env.REFRESH_SECRET, {
-            expiresIn: "7d",
+        const refreshToken = jsonwebtoken_1.default.sign({ userId: user.userId, userName: user.name }, process.env.REFRESH_SECRET, {
+            expiresIn: "5min",
         });
         setRefreshTokenCookie(res, refreshToken);
         const { password: userPassword } = user, userDetails = __rest(user, ["password"]);
@@ -109,22 +109,14 @@ const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             return;
         }
         console.log(token, "verify token");
-        // jwt.verify(
-        //   token,
-        //   process.env.REFRESH_SECRET as string,
-        //   (err: any, decoded: any) => {
-        //     if (err) {
-        //       res.status(403).json({ message: "Invalid refresh token" });
-        //       return;
-        //     }
-        //     const accessToken = jwt.sign(
-        //       { id: decoded.userId, userName: decoded.name },
-        //       process.env.JWT_SECRET as string,
-        //       { expiresIn: "15m" }
-        //     );
-        //     return res.json({ accessToken });
-        //   }
-        // );
+        jsonwebtoken_1.default.verify(token, process.env.REFRESH_SECRET, (err, decoded) => {
+            if (err) {
+                res.status(403).json({ message: "Invalid refresh token" });
+                return;
+            }
+            const accessToken = jsonwebtoken_1.default.sign({ id: decoded.userId, userName: decoded.name }, process.env.JWT_SECRET, { expiresIn: "2m" });
+            return res.json({ accessToken });
+        });
     }
     catch (error) {
         console.error(error);

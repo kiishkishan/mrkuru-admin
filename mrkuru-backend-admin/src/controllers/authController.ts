@@ -71,15 +71,15 @@ export const loginUser = async (req: Request, res: Response) => {
       { id: user.userId, userName: user.name },
       process.env.JWT_SECRET!,
       {
-        expiresIn: "15m",
+        expiresIn: "2min",
       }
     );
 
     const refreshToken = jwt.sign(
-      { userId: user.userId },
+      { userId: user.userId, userName: user.name },
       process.env.REFRESH_SECRET!,
       {
-        expiresIn: "7d",
+        expiresIn: "5min",
       }
     );
 
@@ -106,22 +106,22 @@ export const refreshToken = async (req: Request, res: Response) => {
       return;
     }
     console.log(token, "verify token");
-    // jwt.verify(
-    //   token,
-    //   process.env.REFRESH_SECRET as string,
-    //   (err: any, decoded: any) => {
-    //     if (err) {
-    //       res.status(403).json({ message: "Invalid refresh token" });
-    //       return;
-    //     }
-    //     const accessToken = jwt.sign(
-    //       { id: decoded.userId, userName: decoded.name },
-    //       process.env.JWT_SECRET as string,
-    //       { expiresIn: "15m" }
-    //     );
-    //     return res.json({ accessToken });
-    //   }
-    // );
+    jwt.verify(
+      token,
+      process.env.REFRESH_SECRET as string,
+      (err: any, decoded: any) => {
+        if (err) {
+          res.status(403).json({ message: "Invalid refresh token" });
+          return;
+        }
+        const accessToken = jwt.sign(
+          { id: decoded.userId, userName: decoded.name },
+          process.env.JWT_SECRET as string,
+          { expiresIn: "2m" }
+        );
+        return res.json({ accessToken });
+      }
+    );
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error" });

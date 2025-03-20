@@ -9,7 +9,7 @@ export interface Login {
 
 export interface LoginResponse {
   accessToken: string;
-  tokenExpiration: number;
+  expirationTime: string;
   user: {
     name: string;
     profileImage: string;
