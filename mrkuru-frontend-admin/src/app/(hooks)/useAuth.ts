@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // useAuth.ts
-import { useLayoutEffect, useRef } from "react";
+import { useCallback, useLayoutEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux";
 import { logoutUser, setAuth } from "@/state/slices/authSlice";
 import useRouterReady from "./useRouterReady";
@@ -10,7 +10,6 @@ import { jwtDecode } from "jwt-decode";
 interface JWTPayload {
   exp: number;
 }
-
 const useAuth = () => {
   const dispatch = useAppDispatch();
   const { router } = useRouterReady();
@@ -21,7 +20,22 @@ const useAuth = () => {
   const [refreshTokenMutation] = useRefreshTokenMutation();
   const [logOutMutation] = useLogoutMutation();
 
+  const INACTIVITY_LIMIT = 10 * 60 * 1000; // 10 minutes
+
   const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
+
+  const resetInactivityTimer = useCallback(() => {
+    if (inactivityTimer.current) {
+      clearTimeout(inactivityTimer.current);
+    }
+    inactivityTimer.current = setTimeout(async () => {
+      console.log("User inactive for too long, logging out...");
+      await logOutMutation().unwrap();
+      dispatch(logoutUser());
+      router.push("/login");
+    }, INACTIVITY_LIMIT);
+  }, [INACTIVITY_LIMIT, logOutMutation, dispatch, router]);
 
   useLayoutEffect(() => {
     if (timerRef.current) {
@@ -85,6 +99,14 @@ const useAuth = () => {
       }
     };
 
+    // Start inactivity detection
+    const events = ["mousemove", "keydown", "scroll", "click"];
+    events.forEach((event) =>
+      window.addEventListener(event, resetInactivityTimer)
+    );
+
+    resetInactivityTimer(); // Start timer
+
     // Set an interval to check expiration every 5 seconds
     timerRef.current = setInterval(checkTokenExpiry, 5000);
 
@@ -101,6 +123,7 @@ const useAuth = () => {
     router,
     refreshTokenMutation,
     logOutMutation,
+    resetInactivityTimer,
   ]);
 
   return { isAuthenticated, accessToken };

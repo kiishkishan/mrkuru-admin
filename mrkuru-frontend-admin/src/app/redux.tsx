@@ -53,7 +53,7 @@ const storage =
 const authPersistConfig = {
   key: "auth",
   storage,
-  whitelist: ["userName", "userImage"], // Persist only these fields
+  whitelist: [],
 };
 
 // Apply persistReducer only to authReducer
