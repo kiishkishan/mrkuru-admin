@@ -54,6 +54,13 @@ export const authSlice = createSlice({
             "accessToken",
             action.payload.accessToken
           );
+          window.sessionStorage.setItem(
+            "userData",
+            JSON.stringify({
+              userName: action.payload.userName,
+              userImage: action.payload.userImage,
+            })
+          );
         } else {
           window.sessionStorage.removeItem("accessToken");
         }
@@ -73,6 +80,7 @@ export const authSlice = createSlice({
 
       if (typeof window !== "undefined") {
         window.sessionStorage.removeItem("accessToken");
+        window.sessionStorage.removeItem("userData");
       }
     },
   },

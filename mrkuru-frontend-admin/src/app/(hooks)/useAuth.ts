@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // useAuth.ts
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { useAppDispatch, useAppSelector } from "../redux";
 import { logoutUser, setAuth } from "@/state/slices/authSlice";
 import useRouterReady from "./useRouterReady";
@@ -23,56 +23,74 @@ const useAuth = () => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
     }
 
     if (!isAuthenticated || !accessToken || !expirationTime) {
+      console.log("tokens false check in");
       router.push("/login");
       return;
     }
 
-    const currentTime = Math.floor(Date.now() / 1000);
-    const remainingTime = expirationTime - currentTime;
+    const checkTokenExpiry = async () => {
+      const currentTime = Math.floor(Date.now() / 1000);
+      const remainingTime = expirationTime - currentTime;
+      console.log("checkTokenExpiry remainingTime", {
+        currentTime,
+        remainingTime,
+      });
 
-    if (remainingTime <= 0) {
-      dispatch(logoutUser());
-      router.push("/login");
-      return;
-    }
+      if (remainingTime <= 50) {
+        // Refresh token before expiry
+        console.log("Attempting to refresh token before expiry");
+        try {
+          const refreshTokenRequest = {
+            accessToken,
+          };
 
-    timerRef.current = setTimeout(async () => {
-      try {
-        const response = await refreshTokenMutation().unwrap();
+          const response = await refreshTokenMutation(
+            refreshTokenRequest
+          ).unwrap();
 
-        if (response.accessToken) {
-          const decodedToken: JWTPayload = jwtDecode(response?.accessToken);
-          console.log("decodedToken jwtDecode", decodedToken);
-          const expirationTime = decodedToken.exp;
+          if (response.accessToken) {
+            const decodedToken: JWTPayload = jwtDecode(response.accessToken);
+            console.log("decodedToken jwtDecode", decodedToken);
+            const newExpirationTime = decodedToken.exp;
 
-          dispatch(
-            setAuth({
-              isAuthenticated: true,
-              accessToken: response?.accessToken,
-              expirationTime,
-            })
-          );
-        } else {
+            const storedUserData = window.sessionStorage.getItem("userData");
+            const parsedUserData = storedUserData
+              ? JSON.parse(storedUserData)
+              : {};
+
+            dispatch(
+              setAuth({
+                isAuthenticated: true,
+                accessToken: response.accessToken,
+                expirationTime: newExpirationTime,
+                userName: parsedUserData.userName || null, // Restore userName
+                userImage: parsedUserData.userImage || null, // Restore userImage
+              })
+            );
+          } else {
+            throw new Error("Invalid refresh response");
+          }
+        } catch (error: any) {
+          console.error("Error refreshing token:", error);
+          await logOutMutation().unwrap();
           dispatch(logoutUser());
           router.push("/login");
         }
-      } catch (error: any) {
-        console.error("Error refreshing token:", error);
-        await logOutMutation().unwrap();
-        dispatch(logoutUser());
-        router.push("/login");
       }
-    }, remainingTime * 1000);
+    };
+
+    // Set an interval to check expiration every 5 seconds
+    timerRef.current = setInterval(checkTokenExpiry, 5000);
 
     return () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current);
+        clearInterval(timerRef.current);
       }
     };
   }, [

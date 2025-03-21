@@ -36,7 +36,9 @@ const LoginPage = () => {
 
   const { router } = useRouterReady();
 
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const isAuthenticated = useAppSelector(
+    (state) => state?.auth.isAuthenticated
+  );
 
   useEffect(() => {
     if (isAuthenticated) {

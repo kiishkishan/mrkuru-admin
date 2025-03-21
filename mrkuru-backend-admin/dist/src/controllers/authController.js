@@ -81,16 +81,18 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const accessToken = jsonwebtoken_1.default.sign({ id: user.userId, userName: user.name }, process.env.JWT_SECRET, {
-            expiresIn: "2min",
+            expiresIn: "15min",
         });
         const refreshToken = jsonwebtoken_1.default.sign({ userId: user.userId, userName: user.name }, process.env.REFRESH_SECRET, {
-            expiresIn: "5min",
+            expiresIn: "5h",
         });
+        console.log("login refreshToken", refreshToken);
         setRefreshTokenCookie(res, refreshToken);
         const { password: userPassword } = user, userDetails = __rest(user, ["password"]);
         res.status(201).json({
             message: "User logged in successfully",
             accessToken,
+            refreshToken, // only in development
             user: userDetails,
         });
     }
@@ -101,20 +103,21 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.loginUser = loginUser;
 const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
     try {
-        const token = (_a = req.cookies) === null || _a === void 0 ? void 0 : _a.refreshToken;
-        if (!token) {
-            res.status(401).json({ message: "No refresh token" });
+        const { refreshToken } = req.cookies; // for prod
+        // const refreshToken = req.body; // Read from request body instead of cookies in localhost
+        if (!refreshToken) {
+            res.status(401).json({ message: "No refresh token found from request" });
             return;
         }
-        console.log(token, "verify token");
-        jsonwebtoken_1.default.verify(token, process.env.REFRESH_SECRET, (err, decoded) => {
+        console.log(refreshToken, "verify token");
+        jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
             if (err) {
                 res.status(403).json({ message: "Invalid refresh token" });
                 return;
             }
-            const accessToken = jsonwebtoken_1.default.sign({ id: decoded.userId, userName: decoded.name }, process.env.JWT_SECRET, { expiresIn: "2m" });
+            const accessToken = jsonwebtoken_1.default.sign({ id: decoded.userId, userName: decoded.name }, process.env.JWT_SECRET, { expiresIn: "15m" });
+            console.log("refreshToken func accessToken", accessToken);
             return res.json({ accessToken });
         });
     }

@@ -71,7 +71,7 @@ export const loginUser = async (req: Request, res: Response) => {
       { id: user.userId, userName: user.name },
       process.env.JWT_SECRET!,
       {
-        expiresIn: "2min",
+        expiresIn: "15min",
       }
     );
 
@@ -79,9 +79,11 @@ export const loginUser = async (req: Request, res: Response) => {
       { userId: user.userId, userName: user.name },
       process.env.REFRESH_SECRET!,
       {
-        expiresIn: "5min",
+        expiresIn: "5h",
       }
     );
+
+    console.log("login refreshToken", refreshToken);
 
     setRefreshTokenCookie(res, refreshToken);
 
@@ -90,6 +92,7 @@ export const loginUser = async (req: Request, res: Response) => {
     res.status(201).json({
       message: "User logged in successfully",
       accessToken,
+      refreshToken, // only in development
       user: userDetails,
     });
   } catch (error) {
@@ -100,14 +103,16 @@ export const loginUser = async (req: Request, res: Response) => {
 
 export const refreshToken = async (req: Request, res: Response) => {
   try {
-    const token = req.cookies?.refreshToken;
-    if (!token) {
-      res.status(401).json({ message: "No refresh token" });
+    const { refreshToken } = req.cookies; // for prod
+    // const refreshToken = req.body; // Read from request body instead of cookies in localhost
+
+    if (!refreshToken) {
+      res.status(401).json({ message: "No refresh token found from request" });
       return;
     }
-    console.log(token, "verify token");
+    console.log(refreshToken, "verify token");
     jwt.verify(
-      token,
+      refreshToken,
       process.env.REFRESH_SECRET as string,
       (err: any, decoded: any) => {
         if (err) {
@@ -117,8 +122,10 @@ export const refreshToken = async (req: Request, res: Response) => {
         const accessToken = jwt.sign(
           { id: decoded.userId, userName: decoded.name },
           process.env.JWT_SECRET as string,
-          { expiresIn: "2m" }
+          { expiresIn: "15m" }
         );
+
+        console.log("refreshToken func accessToken", accessToken);
         return res.json({ accessToken });
       }
     );

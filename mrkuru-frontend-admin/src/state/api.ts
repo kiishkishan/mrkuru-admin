@@ -9,11 +9,16 @@ export interface Login {
 
 export interface LoginResponse {
   accessToken: string;
+  refreshToken: string;
   expirationTime: string;
   user: {
     name: string;
     profileImage: string;
   };
+}
+
+export interface RefreshToken {
+  accessToken: string;
 }
 
 //signup type
@@ -186,10 +191,12 @@ export const api = createApi({
       }),
       invalidatesTags: ["Auth"],
     }),
-    refreshToken: build.mutation<{ accessToken: string }, void>({
-      query: () => ({
+    refreshToken: build.mutation<RefreshToken, RefreshToken>({
+      query: (refreshToken) => ({
         url: "/auth/refresh",
         method: "POST", // Use POST if your backend expects it
+        credentials: "include",
+        body: refreshToken,
       }),
     }),
 
