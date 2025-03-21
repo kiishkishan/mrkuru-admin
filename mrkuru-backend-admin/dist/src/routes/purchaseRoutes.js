@@ -4,7 +4,7 @@ const express_1 = require("express");
 const purchaseController_1 = require("../controllers/purchaseController");
 const isAuth_1 = require("../middleware/isAuth");
 const router = (0, express_1.Router)();
-router.use(isAuth_1.isAuth);
+router.use(isAuth_1.isAuthVerifyToken);
 router.get("/suppliers", purchaseController_1.getSuppliers);
 router.post("/suppliers", purchaseController_1.createSuppliers);
 router.delete("/suppliers", purchaseController_1.deleteSupplier);

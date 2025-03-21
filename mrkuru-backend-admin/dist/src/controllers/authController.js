@@ -23,7 +23,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signUpUser = exports.loginUser = void 0;
+exports.logoutUser = exports.signUpUser = exports.refreshToken = exports.loginUser = void 0;
 const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
@@ -46,6 +46,15 @@ const s3 = new client_s3_1.S3Client({
         secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
     },
 });
+// Set Refresh Token as HTTP-Only Cookie
+const setRefreshTokenCookie = (res, token) => {
+    res.cookie("refreshToken", token, {
+        httpOnly: true,
+        secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
+        sameSite: "strict",
+        path: "/auth/refresh",
+    });
+};
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const { email, password } = req.body;
@@ -71,13 +80,19 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             res.status(401).json({ message: "JWT Secret Key Error" });
             return;
         }
-        const token = jsonwebtoken_1.default.sign({ id: user.userId, userName: user.name }, process.env.JWT_SECRET, {
-            expiresIn: "1m",
+        const accessToken = jsonwebtoken_1.default.sign({ id: user.userId, userName: user.name }, process.env.JWT_SECRET, {
+            expiresIn: "15min",
         });
+        const refreshToken = jsonwebtoken_1.default.sign({ userId: user.userId, userName: user.name }, process.env.REFRESH_SECRET, {
+            expiresIn: "5h",
+        });
+        console.log("login refreshToken", refreshToken);
+        setRefreshTokenCookie(res, refreshToken);
         const { password: userPassword } = user, userDetails = __rest(user, ["password"]);
         res.status(201).json({
             message: "User logged in successfully",
-            token,
+            accessToken,
+            refreshToken, // only in development
             user: userDetails,
         });
     }
@@ -87,6 +102,31 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.loginUser = loginUser;
+const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const { refreshToken } = req.cookies; // for prod
+        // const refreshToken = req.body; // Read from request body instead of cookies in localhost
+        if (!refreshToken) {
+            res.status(401).json({ message: "No refresh token found from request" });
+            return;
+        }
+        console.log(refreshToken, "verify token");
+        jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
+            if (err) {
+                res.status(403).json({ message: "Invalid refresh token" });
+                return;
+            }
+            const accessToken = jsonwebtoken_1.default.sign({ id: decoded.userId, userName: decoded.name }, process.env.JWT_SECRET, { expiresIn: "15m" });
+            console.log("refreshToken func accessToken", accessToken);
+            return res.json({ accessToken });
+        });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Server error" });
+    }
+});
+exports.refreshToken = refreshToken;
 const signUpUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         console.log("File:", req.file);
@@ -181,3 +221,13 @@ const signUpUser = (req, res, next) => __awaiter(void 0, void 0, void 0, functio
     }
 });
 exports.signUpUser = signUpUser;
+const logoutUser = (req, res) => {
+    res.clearCookie("refreshToken", {
+        httpOnly: true,
+        secure: process.env.COOKIE_SECURE === "true",
+        sameSite: "strict",
+        path: "/auth/refresh",
+    });
+    res.json({ message: "Logged out successfully" });
+};
+exports.logoutUser = logoutUser;

@@ -25,6 +25,16 @@ const s3 = new S3Client({
   },
 });
 
+// Set Refresh Token as HTTP-Only Cookie
+const setRefreshTokenCookie = (res: Response, token: string) => {
+  res.cookie("refreshToken", token, {
+    httpOnly: true,
+    secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
+    sameSite: "strict",
+    path: "/auth/refresh",
+  });
+};
+
 export const loginUser = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -57,24 +67,71 @@ export const loginUser = async (req: Request, res: Response) => {
       return;
     }
 
-    const token = jwt.sign(
+    const accessToken = jwt.sign(
       { id: user.userId, userName: user.name },
-      process.env.JWT_SECRET,
+      process.env.JWT_SECRET!,
       {
-        expiresIn: "1m",
+        expiresIn: "15min",
       }
     );
+
+    const refreshToken = jwt.sign(
+      { userId: user.userId, userName: user.name },
+      process.env.REFRESH_SECRET!,
+      {
+        expiresIn: "5h",
+      }
+    );
+
+    console.log("login refreshToken", refreshToken);
+
+    setRefreshTokenCookie(res, refreshToken);
 
     const { password: userPassword, ...userDetails } = user;
 
     res.status(201).json({
       message: "User logged in successfully",
-      token,
+      accessToken,
+      refreshToken, // only in development
       user: userDetails,
     });
   } catch (error) {
     console.error("Error logging in:", error);
     res.status(500).json({ message: "Error logging in" });
+  }
+};
+
+export const refreshToken = async (req: Request, res: Response) => {
+  try {
+    const { refreshToken } = req.cookies; // for prod
+    // const refreshToken = req.body; // Read from request body instead of cookies in localhost
+
+    if (!refreshToken) {
+      res.status(401).json({ message: "No refresh token found from request" });
+      return;
+    }
+    console.log(refreshToken, "verify token");
+    jwt.verify(
+      refreshToken,
+      process.env.REFRESH_SECRET as string,
+      (err: any, decoded: any) => {
+        if (err) {
+          res.status(403).json({ message: "Invalid refresh token" });
+          return;
+        }
+        const accessToken = jwt.sign(
+          { id: decoded.userId, userName: decoded.name },
+          process.env.JWT_SECRET as string,
+          { expiresIn: "15m" }
+        );
+
+        console.log("refreshToken func accessToken", accessToken);
+        return res.json({ accessToken });
+      }
+    );
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
@@ -187,4 +244,14 @@ export const signUpUser = async (
     console.error("Error processing product:", error);
     next(error);
   }
+};
+
+export const logoutUser = (req: Request, res: Response) => {
+  res.clearCookie("refreshToken", {
+    httpOnly: true,
+    secure: process.env.COOKIE_SECURE === "true",
+    sameSite: "strict",
+    path: "/auth/refresh",
+  });
+  res.json({ message: "Logged out successfully" });
 };

@@ -4,6 +4,7 @@ import bodyParser from "body-parser";
 import cors from "cors";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 // ROUTE IMPORTS
 import dashboardRoutes from "./routes/dashboardRoutes";
@@ -21,7 +22,13 @@ app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" })); // Cross-
 app.use(morgan("common"));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cors());
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.CLIENT_URL,
+    credentials: true, // Allows cookies to be sent
+  })
+);
 
 // ROUTES
 app.use("/dashboard", dashboardRoutes);

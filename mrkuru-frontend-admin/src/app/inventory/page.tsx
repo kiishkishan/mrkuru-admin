@@ -46,9 +46,9 @@ const Inventory = () => {
   const [deleteProduct] = useDeleteProductMutation();
 
   // redux states
-  const isDarkMode = useAppSelector((state) => state.global.isDarkMode);
+  const isDarkMode = useAppSelector((state) => state?.global.isDarkMode);
   const isSidebarCollapsed = useAppSelector(
-    (state) => state.global.isSidebarCollapsed
+    (state) => state?.global.isSidebarCollapsed
   );
 
   // local usestate
@@ -274,7 +274,7 @@ const Inventory = () => {
       {
         field: "actions",
         headerName: "Actions",
-        width: 200,
+        width: 190,
         align: "center",
         headerAlign: "center",
         sortable: false,
@@ -351,6 +351,7 @@ const Inventory = () => {
       <StatusFilter
         statusFilter={statusFilter}
         onStatusFilterChange={handleStatusFilterChange}
+        statusFilterItems={["All", "In Stock", "On Hold", "Out of Stock"]}
       />
       <ThemeProvider theme={theme}>
         <DataGrid

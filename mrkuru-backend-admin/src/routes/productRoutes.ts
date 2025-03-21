@@ -6,11 +6,11 @@ import {
   holdSellingProduct,
 } from "../controllers/productController";
 import upload from "../config/multerConfig";
-import { isAuth } from "../middleware/isAuth";
+import { isAuthVerifyToken } from "../middleware/isAuth";
 
 const router = Router();
 
-router.use(isAuth);
+router.use(isAuthVerifyToken);
 
 router.get("/", getProducts);
 router.post("/", upload.single("image"), createProduct);

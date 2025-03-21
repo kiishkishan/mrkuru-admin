@@ -28,6 +28,7 @@ import {
 } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import createWebStorage from "redux-persist/lib/storage/createWebStorage";
+import AuthProvider from "./authProvider";
 
 /* REDUX PERSISTENCE */
 const createNoopStorage = () => {
@@ -49,19 +50,19 @@ const storage =
     ? createNoopStorage()
     : createWebStorage("local");
 
-const authPersistConfig = {
-  key: "auth",
-  storage,
-  whitelist: ["userName", "userImage"], // Persist only these fields
-};
+// const authPersistConfig = {
+//   key: "auth",
+//   storage,
+//   whitelist: [""],
+// };
 
-// Apply persistReducer only to authReducer
-const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
+// // Apply persistReducer only to authReducer
+// const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 
 const rootReducer = combineReducers({
   global: globalReducer,
   alert: alertReducer,
-  auth: persistedAuthReducer, // Use persisted auth reducer
+  auth: authReducer, // Use persisted auth reducer
   [api.reducerPath]: api.reducer,
 });
 
@@ -108,6 +109,7 @@ export default function StoreProvider({
 
   return (
     <Provider store={storeRef.current}>
+      <AuthProvider />
       <PersistGate loading={null} persistor={persistor}>
         {children}
       </PersistGate>

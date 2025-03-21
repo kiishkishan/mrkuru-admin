@@ -1,22 +1,28 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { jwtDecode } from "jwt-decode";
 
 interface AuthState {
   isAuthenticated: boolean;
-  token: string | null;
+  accessToken: string | null;
   userName: string | null;
   userImage: string | null;
+  expirationTime: number | null;
 }
 
 const initialState: AuthState = {
-  isAuthenticated:
-    typeof window !== "undefined" && !!window.sessionStorage.getItem("token"), // Load authentication state
-  token:
-    typeof window !== "undefined"
-      ? window.sessionStorage.getItem("token")
-      : null, // Load token from session storage
+  isAuthenticated: false, // Avoid direct access to `window`
+  accessToken: null,
   userName: null,
   userImage: null,
+  expirationTime: null,
 };
+
+let logoutTimer: any; // Store the timer ID
+
+interface JWTPayload {
+  exp: number;
+}
 
 export const authSlice = createSlice({
   name: "auth",
@@ -26,34 +32,59 @@ export const authSlice = createSlice({
       state,
       action: PayloadAction<{
         isAuthenticated: boolean;
-        token: string | null;
+        accessToken: string | null;
         userName?: string | null;
         userImage?: string | null;
+        expirationTime?: number; // Make expirationTime optional
       }>
     ) => {
       state.isAuthenticated = action.payload.isAuthenticated;
-      state.token = action.payload.token;
+      state.accessToken = action.payload.accessToken;
       state.userName = action.payload.userName || null;
       state.userImage = action.payload.userImage || null;
 
-      if (action.payload.token) {
-        window.sessionStorage.setItem("token", action.payload.token);
-      } else {
-        window.sessionStorage.removeItem("token");
+      //Get token details from jwt
+      const decodedToken: JWTPayload = jwtDecode(action.payload.accessToken!);
+      console.log("authSlice decodedToken", decodedToken);
+      state.expirationTime = decodedToken?.exp;
+
+      if (typeof window !== "undefined") {
+        if (action.payload.accessToken) {
+          window.sessionStorage.setItem(
+            "accessToken",
+            action.payload.accessToken
+          );
+          window.sessionStorage.setItem(
+            "userData",
+            JSON.stringify({
+              userName: action.payload.userName,
+              userImage: action.payload.userImage,
+            })
+          );
+        } else {
+          window.sessionStorage.removeItem("accessToken");
+        }
       }
     },
 
     logoutUser: (state) => {
       state.isAuthenticated = false;
-      state.token = null;
+      state.accessToken = null;
       state.userName = null;
       state.userImage = null;
-      window.sessionStorage.removeItem("token");
-      window.location.href = "/";
+      state.expirationTime = null;
+
+      if (logoutTimer) {
+        clearTimeout(logoutTimer); // Clear the timer on explicit logout
+      }
+
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem("accessToken");
+        window.sessionStorage.removeItem("userData");
+      }
     },
   },
 });
 
 export const { setAuth, logoutUser } = authSlice.actions;
-
 export default authSlice.reducer;
