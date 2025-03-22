@@ -32,6 +32,7 @@ const setRefreshTokenCookie = (res: Response, token: string) => {
     secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
     sameSite: "strict",
     path: "/auth/refresh",
+    domain: process.env.COOKIE_DOMAIN,
   });
 };
 
@@ -83,8 +84,6 @@ export const loginUser = async (req: Request, res: Response) => {
       }
     );
 
-    console.log("login refreshToken", refreshToken);
-
     setRefreshTokenCookie(res, refreshToken);
 
     const { password: userPassword, ...userDetails } = user;
@@ -110,7 +109,7 @@ export const refreshToken = async (req: Request, res: Response) => {
       res.status(401).json({ message: "No refresh token found from request" });
       return;
     }
-    console.log(refreshToken, "verify token");
+
     jwt.verify(
       refreshToken,
       process.env.REFRESH_SECRET as string,
@@ -252,6 +251,7 @@ export const logoutUser = (req: Request, res: Response) => {
     secure: process.env.COOKIE_SECURE === "true",
     sameSite: "strict",
     path: "/auth/refresh",
+    domain: process.env.COOKIE_DOMAIN,
   });
   res.json({ message: "Logged out successfully" });
 };

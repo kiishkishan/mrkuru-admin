@@ -167,9 +167,6 @@ export const api = createApi({
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState; // Adjust based on your state structure
       const token = state.auth?.accessToken;
-
-      console.log("prepareHeaders token", token);
-
       headers.set("Authorization", `Bearer ${token}`);
     },
   }),

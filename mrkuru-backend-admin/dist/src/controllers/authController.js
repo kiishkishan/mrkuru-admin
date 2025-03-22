@@ -53,6 +53,7 @@ const setRefreshTokenCookie = (res, token) => {
         secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
         sameSite: "strict",
         path: "/auth/refresh",
+        domain: process.env.COOKIE_DOMAIN,
     });
 };
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -86,7 +87,6 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const refreshToken = jsonwebtoken_1.default.sign({ userId: user.userId, userName: user.name }, process.env.REFRESH_SECRET, {
             expiresIn: "5h",
         });
-        console.log("login refreshToken", refreshToken);
         setRefreshTokenCookie(res, refreshToken);
         const { password: userPassword } = user, userDetails = __rest(user, ["password"]);
         res.status(201).json({
@@ -110,7 +110,6 @@ const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* (
             res.status(401).json({ message: "No refresh token found from request" });
             return;
         }
-        console.log(refreshToken, "verify token");
         jsonwebtoken_1.default.verify(refreshToken, process.env.REFRESH_SECRET, (err, decoded) => {
             if (err) {
                 res.status(403).json({ message: "Invalid refresh token" });
@@ -227,6 +226,7 @@ const logoutUser = (req, res) => {
         secure: process.env.COOKIE_SECURE === "true",
         sameSite: "strict",
         path: "/auth/refresh",
+        domain: process.env.COOKIE_DOMAIN,
     });
     res.json({ message: "Logged out successfully" });
 };
