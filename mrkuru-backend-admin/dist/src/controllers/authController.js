@@ -53,7 +53,7 @@ const setRefreshTokenCookie = (res, token) => {
         secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
         sameSite: "strict",
         path: "/auth/refresh",
-        domain: process.env.COOKIE_DOMAIN,
+        domain: process.env.COOKIE_DOMAIN || undefined,
     });
 };
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -104,8 +104,11 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 exports.loginUser = loginUser;
 const refreshToken = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const { refreshToken } = req.cookies; // for prod
-        // const refreshToken = req.body; // Read from request body instead of cookies in localhost
+        // const { refreshToken } = req.cookies; // for local
+        const cookies = req.cookies;
+        const refreshToken = Object.values(cookies).find((cookie) => cookie.includes(".") // JWT always contains dots (.)
+        );
+        console.log("Detected refreshToken:", refreshToken);
         if (!refreshToken) {
             res.status(401).json({ message: "No refresh token found from request" });
             return;
@@ -226,7 +229,7 @@ const logoutUser = (req, res) => {
         secure: process.env.COOKIE_SECURE === "true",
         sameSite: "strict",
         path: "/auth/refresh",
-        domain: process.env.COOKIE_DOMAIN,
+        domain: process.env.COOKIE_DOMAIN || undefined,
     });
     res.json({ message: "Logged out successfully" });
 };
