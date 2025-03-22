@@ -14,7 +14,7 @@ const useAuth = () => {
   const dispatch = useAppDispatch();
   const { router } = useRouterReady();
   const { accessToken, isAuthenticated, expirationTime } = useAppSelector(
-    (state) => state.auth
+    (state) => state?.auth
   );
 
   const [refreshTokenMutation] = useRefreshTokenMutation();
