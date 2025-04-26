@@ -49,11 +49,12 @@ const s3 = new client_s3_1.S3Client({
 // Set Refresh Token as HTTP-Only Cookie
 const setRefreshTokenCookie = (res, token) => {
     res.cookie("refreshToken", token, {
-        httpOnly: true,
+        httpOnly: true, // Set to true for production
         secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
         sameSite: "strict",
         path: "/auth/refresh",
-        domain: process.env.COOKIE_DOMAIN || "http://localhost:3000/",
+        domain: process.env.COOKIE_DOMAIN || "localhost" || undefined, // Set to your domain in production
+        maxAge: 5 * 60 * 60 * 1000, // 5 hours
     });
 };
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
