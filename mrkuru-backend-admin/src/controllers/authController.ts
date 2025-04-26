@@ -32,7 +32,7 @@ const setRefreshTokenCookie = (res: Response, token: string) => {
     secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
     sameSite: "strict",
     path: "/auth/refresh",
-    domain: process.env.COOKIE_DOMAIN || undefined,
+    domain: process.env.COOKIE_DOMAIN || "http://localhost:3000/",
   });
 };
 
@@ -72,7 +72,7 @@ export const loginUser = async (req: Request, res: Response) => {
       { id: user.userId, userName: user.name },
       process.env.JWT_SECRET!,
       {
-        expiresIn: "15min",
+        expiresIn: "5min",
       }
     );
 

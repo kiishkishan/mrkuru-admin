@@ -53,7 +53,7 @@ const setRefreshTokenCookie = (res, token) => {
         secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
         sameSite: "strict",
         path: "/auth/refresh",
-        domain: process.env.COOKIE_DOMAIN || undefined,
+        domain: process.env.COOKIE_DOMAIN || "http://localhost:3000/",
     });
 };
 const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
