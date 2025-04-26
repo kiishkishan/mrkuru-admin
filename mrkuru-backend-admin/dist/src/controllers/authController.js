@@ -82,7 +82,7 @@ const loginUser = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return;
         }
         const accessToken = jsonwebtoken_1.default.sign({ id: user.userId, userName: user.name }, process.env.JWT_SECRET, {
-            expiresIn: "15min",
+            expiresIn: "2min",
         });
         const refreshToken = jsonwebtoken_1.default.sign({ userId: user.userId, userName: user.name }, process.env.REFRESH_SECRET, {
             expiresIn: "5h",
