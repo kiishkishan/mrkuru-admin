@@ -25,7 +25,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(
   cors({
-    origin: process.env.CLIENT_URL,
+    origin: "https://mrkuru-admin-frontend-rho.vercel.app", // process.env.CLIENT_URL- Replace with your client URL
     credentials: true, // Allows cookies to be sent
   })
 );

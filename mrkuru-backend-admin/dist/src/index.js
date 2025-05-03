@@ -27,7 +27,7 @@ app.use(body_parser_1.default.json());
 app.use(body_parser_1.default.urlencoded({ extended: false }));
 app.use((0, cookie_parser_1.default)());
 app.use((0, cors_1.default)({
-    origin: process.env.CLIENT_URL,
+    origin: "https://mrkuru-admin-frontend-rho.vercel.app", // process.env.CLIENT_URL- Replace with your client URL
     credentials: true, // Allows cookies to be sent
 }));
 // ROUTES
