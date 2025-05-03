@@ -164,6 +164,7 @@ export interface DashboardMetrics {
 export const api = createApi({
   baseQuery: fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_API_BASE_URL,
+    credentials: "include", // Include credentials (cookies) in requests
     prepareHeaders: (headers, { getState }) => {
       const state = getState() as RootState; // Adjust based on your state structure
       const token = state.auth?.accessToken;
