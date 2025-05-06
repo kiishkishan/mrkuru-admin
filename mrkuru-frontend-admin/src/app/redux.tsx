@@ -50,26 +50,26 @@ const storage =
     ? createNoopStorage()
     : createWebStorage("local");
 
-// const authPersistConfig = {
-//   key: "auth",
-//   storage,
-//   whitelist: [""],
-// };
+const authPersistConfig = {
+  key: "auth",
+  storage,
+  whitelist: ["accessToken", "isAuthenticated", "expirationTime", "userName", "userImage"],
+};
 
-// // Apply persistReducer only to authReducer
-// const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
+// Apply persistReducer only to authReducer
+const persistedAuthReducer = persistReducer(authPersistConfig, authReducer);
 
 const rootReducer = combineReducers({
   global: globalReducer,
   alert: alertReducer,
-  auth: authReducer, // Use persisted auth reducer
+  auth: persistedAuthReducer, // Use persisted auth reducer
   [api.reducerPath]: api.reducer,
 });
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["global"], // Do NOT include "auth" here, as it's already persisted separately
+  whitelist: ["global", "auth"], // Include auth in the whitelist
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

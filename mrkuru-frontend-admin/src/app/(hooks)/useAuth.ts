@@ -16,6 +16,7 @@ const useAuth = () => {
   const { accessToken, isAuthenticated, expirationTime } = useAppSelector(
     (state) => state?.auth
   );
+  const currentAuthState = useAppSelector((state) => state?.auth);
 
   const [refreshTokenMutation] = useRefreshTokenMutation();
   const [logOutMutation] = useLogoutMutation();
@@ -24,6 +25,35 @@ const useAuth = () => {
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const inactivityTimer = useRef<NodeJS.Timeout | null>(null);
+
+  // Check for persisted session on initial load
+  useLayoutEffect(() => {
+    if (typeof window !== "undefined") {
+      const persistedToken = window.sessionStorage.getItem("accessToken");
+      const persistedUserData = window.sessionStorage.getItem("userData");
+      
+      if (persistedToken && !isAuthenticated) {
+        try {
+          const decodedToken: JWTPayload = jwtDecode(persistedToken);
+          const userData = persistedUserData ? JSON.parse(persistedUserData) : {};
+          
+          dispatch(
+            setAuth({
+              isAuthenticated: true,
+              accessToken: persistedToken,
+              expirationTime: decodedToken.exp,
+              userName: userData.userName || null,
+              userImage: userData.userImage || null,
+            })
+          );
+        } catch (error) {
+          console.error("Error restoring persisted session:", error);
+          window.sessionStorage.removeItem("accessToken");
+          window.sessionStorage.removeItem("userData");
+        }
+      }
+    }
+  }, [dispatch, isAuthenticated]);
 
   const resetInactivityTimer = useCallback(() => {
     if (inactivityTimer.current) {
@@ -40,6 +70,16 @@ const useAuth = () => {
   useLayoutEffect(() => {
     if (timerRef.current) {
       clearTimeout(timerRef.current);
+    }
+
+    // Only redirect if we're sure there's no valid session
+    if (!isAuthenticated && !accessToken && !expirationTime) {
+      const persistedToken = window.sessionStorage.getItem("accessToken");
+      if (!persistedToken) {
+        console.log("No valid session found, redirecting to login");
+        router.push("/login");
+        return;
+      }
     }
 
     if (!isAuthenticated || !accessToken || !expirationTime) {
@@ -73,18 +113,13 @@ const useAuth = () => {
             console.log("decodedToken jwtDecode", decodedToken);
             const newExpirationTime = decodedToken.exp;
 
-            const storedUserData = window.sessionStorage.getItem("userData");
-            const parsedUserData = storedUserData
-              ? JSON.parse(storedUserData)
-              : {};
-
             dispatch(
               setAuth({
                 isAuthenticated: true,
                 accessToken: response.accessToken,
                 expirationTime: newExpirationTime,
-                userName: parsedUserData.userName || null, // Restore userName
-                userImage: parsedUserData.userImage || null, // Restore userImage
+                userName: currentAuthState?.userName || null,
+                userImage: currentAuthState?.userImage || null,
               })
             );
           } else {
@@ -107,8 +142,8 @@ const useAuth = () => {
 
     resetInactivityTimer(); // Start timer
 
-    // Set an interval to check expiration every 5 seconds
-    timerRef.current = setInterval(checkTokenExpiry, 5000);
+    // Set an interval to check expiration every 10 seconds
+    timerRef.current = setInterval(checkTokenExpiry, 10000);
 
     return () => {
       if (timerRef.current) {
@@ -124,6 +159,7 @@ const useAuth = () => {
     refreshTokenMutation,
     logOutMutation,
     resetInactivityTimer,
+    currentAuthState,
   ]);
 
   return { isAuthenticated, accessToken };

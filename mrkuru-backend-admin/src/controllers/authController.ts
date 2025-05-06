@@ -31,7 +31,7 @@ const setRefreshTokenCookie = (res: Response, token: string) => {
     httpOnly: true, // Set to true for production
     secure: process.env.COOKIE_SECURE === "true", // Uses a dedicated env variable
     sameSite: "none",
-    path: "/auth/refresh",
+    path: "/",
     // domain: process.env.COOKIE_DOMAIN || "http://localhost:3000", // Set to your domain in production
     maxAge: 5 * 60 * 60 * 1000, // 5 hours
   });
