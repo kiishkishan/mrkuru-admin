@@ -77,11 +77,25 @@ export const createProduct = async (
 
     let imageUrl = "";
     if (req.file) {
-      const compressedImageBuffer = await sharp(req.file.buffer)
-        .resize(800) // Resize width to 800px
-        .toFormat("webp") // Convert to WebP
-        .webp({ quality: 80 }) // Set quality (0-100)
-        .toBuffer();
+      console.log('Original file size:', req.file.size, 'bytes');
+      console.log('Original file type:', req.file.mimetype);
+
+      let processedBuffer;
+      if (req.file.mimetype === 'image/webp') {
+        // If it's already WebP, just resize if needed
+        processedBuffer = await sharp(req.file.buffer)
+          .resize(800)
+          .toBuffer();
+      } else {
+        // Convert other formats to WebP
+        processedBuffer = await sharp(req.file.buffer)
+          .resize(800)
+          .toFormat("webp")
+          .webp({ quality: 80 })
+          .toBuffer();
+      }
+
+      console.log('Processed buffer size:', processedBuffer.length, 'bytes');
 
       // Generate unique filename
       const fileKey = `product_${productId}.webp`;
@@ -91,7 +105,7 @@ export const createProduct = async (
         new PutObjectCommand({
           Bucket: process.env.AWS_S3_BUCKET_NAME!,
           Key: fileKey,
-          Body: compressedImageBuffer,
+          Body: processedBuffer,
           ContentType: "image/webp",
         })
       );

@@ -74,18 +74,31 @@ const createProduct = (req, res, next) => __awaiter(void 0, void 0, void 0, func
         }
         let imageUrl = "";
         if (req.file) {
-            const compressedImageBuffer = yield (0, sharp_1.default)(req.file.buffer)
-                .resize(800) // Resize width to 800px
-                .toFormat("webp") // Convert to WebP
-                .webp({ quality: 80 }) // Set quality (0-100)
-                .toBuffer();
+            console.log('Original file size:', req.file.size, 'bytes');
+            console.log('Original file type:', req.file.mimetype);
+            let processedBuffer;
+            if (req.file.mimetype === 'image/webp') {
+                // If it's already WebP, just resize if needed
+                processedBuffer = yield (0, sharp_1.default)(req.file.buffer)
+                    .resize(800)
+                    .toBuffer();
+            }
+            else {
+                // Convert other formats to WebP
+                processedBuffer = yield (0, sharp_1.default)(req.file.buffer)
+                    .resize(800)
+                    .toFormat("webp")
+                    .webp({ quality: 80 })
+                    .toBuffer();
+            }
+            console.log('Processed buffer size:', processedBuffer.length, 'bytes');
             // Generate unique filename
             const fileKey = `product_${productId}.webp`;
             // Upload to S3
             yield s3.send(new client_s3_1.PutObjectCommand({
                 Bucket: process.env.AWS_S3_BUCKET_NAME,
                 Key: fileKey,
-                Body: compressedImageBuffer,
+                Body: processedBuffer,
                 ContentType: "image/webp",
             }));
             imageUrl = `https://${process.env.AWS_S3_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${fileKey}`;

@@ -61,6 +61,11 @@ const useAuth = () => {
     }
     inactivityTimer.current = setTimeout(async () => {
       console.log("User inactive for too long, logging out...");
+      // Clear session storage before logout
+      if (typeof window !== "undefined") {
+        window.sessionStorage.removeItem("accessToken");
+        window.sessionStorage.removeItem("userData");
+      }
       await logOutMutation().unwrap();
       dispatch(logoutUser());
       router.push("/login");
@@ -127,6 +132,11 @@ const useAuth = () => {
           }
         } catch (error: any) {
           console.error("Error refreshing token:", error);
+          // Clear session storage on refresh error
+          if (typeof window !== "undefined") {
+            window.sessionStorage.removeItem("accessToken");
+            window.sessionStorage.removeItem("userData");
+          }
           await logOutMutation().unwrap();
           dispatch(logoutUser());
           router.push("/login");
