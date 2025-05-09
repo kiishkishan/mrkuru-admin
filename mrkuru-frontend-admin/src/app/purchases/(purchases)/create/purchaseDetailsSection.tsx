@@ -1,14 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { X } from "lucide-react";
+import { X, Pencil, Check } from "lucide-react";
+
+type Product = {
+  productId: string;
+  name: string;
+  price: number;
+  stockQuantity: number;
+  rating?: number;
+  details?: string;
+  imageUrl: string;
+};
 
 const priceSchema = z.object({
   items: z.array(
     z.object({
-      id: z.number(),
+      id: z.string(),
       name: z.string(),
       price: z
         .number({
@@ -24,7 +34,15 @@ const priceSchema = z.object({
   ),
 });
 
-const PurchaseDetailsSection = () => {
+interface PurchaseDetailsSectionProps {
+  selectedProducts: Product[];
+  onClose?: (productId?: string) => void;
+}
+
+const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSectionProps) => {
+  const [isEditingShipping, setIsEditingShipping] = useState(false);
+  const [shippingCost, setShippingCost] = useState(500.00);
+
   const {
     control,
     watch,
@@ -34,21 +52,57 @@ const PurchaseDetailsSection = () => {
   } = useForm({
     resolver: zodResolver(priceSchema),
     defaultValues: {
-      items: [
-        { id: 1, name: "Premium Headphones", price: 12000.0, quantity: 2 },
-        { id: 2, name: "Wireless Mouse", price: 5000.0, quantity: 6 },
-        { id: 3, name: "Smart Watch", price: 9000.0, quantity: 15 },
-        { id: 4, name: "Power Bank", price: 9000.0, quantity: 15 },
-      ],
+      items: selectedProducts.map(product => ({
+        id: product.productId,
+        name: product.name,
+        price: product.price,
+        quantity: 1
+      }))
     },
   });
 
-  const shippingCost = 15.0;
+  // Update form values when selectedProducts change
+  useEffect(() => {
+    const currentItems = watch("items");
+    const currentItemIds = new Set(currentItems.map(item => item.id));
+    
+    // Add new items
+    selectedProducts.forEach(product => {
+      if (!currentItemIds.has(product.productId)) {
+        setValue("items", [
+          ...currentItems,
+          {
+            id: product.productId,
+            name: product.name,
+            price: product.price,
+            quantity: 1
+          }
+        ]);
+      }
+    });
+
+    // Remove items that are no longer selected
+    const selectedProductIds = new Set(selectedProducts.map(p => p.productId));
+    const updatedItems = currentItems.filter(item => 
+      selectedProductIds.has(item.id)
+    );
+    
+    if (updatedItems.length !== currentItems.length) {
+      setValue("items", updatedItems);
+    }
+  }, [selectedProducts, setValue, watch]);
+
   const items = watch("items");
 
-  const handleDeleteItem = (itemId: number) => {
+  const handleDeleteItem = (itemId: string) => {
     const updatedItems = items.filter((item) => item.id !== itemId);
     setValue("items", updatedItems);
+    onClose?.(itemId); // Notify parent to update selection
+  };
+
+  const handleCloseAll = () => {
+    setValue("items", []);
+    onClose?.(); // Notify parent to clear all selections
   };
 
   const subtotal = items.reduce(
@@ -57,6 +111,13 @@ const PurchaseDetailsSection = () => {
   );
 
   const total = subtotal + shippingCost;
+
+  const handleShippingCostChange = (value: string) => {
+    const numValue = parseFloat(value);
+    if (!isNaN(numValue) && numValue >= 0) {
+      setShippingCost(Number(numValue.toFixed(2)));
+    }
+  };
 
   const onSubmit = (data: any) => {
     console.log("Form submitted:", data);
@@ -68,7 +129,10 @@ const PurchaseDetailsSection = () => {
       {/* Header with Close Icon */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="font-semibold text-lg text-gray-900">Your Cart</h2>
-        <button className="text-gray-500 hover:text-gray-700">
+        <button 
+          className="text-gray-500 hover:text-gray-700"
+          onClick={handleCloseAll}
+        >
           <X className="h-5 w-5" />
         </button>
       </div>
@@ -77,21 +141,23 @@ const PurchaseDetailsSection = () => {
       <div className="space-y-4 mb-8">
         {items.map((item, index) => (
           <div key={item.id} className="border-b pb-4 group relative">
-            <div className="flex justify-start gap-3 items-center pb-4">
-              <h3 className="font-medium text-gray-900">{item.name}</h3>
-              {/* Delete Item Icon */}
-              <button
-                type="button"
-                onClick={() => handleDeleteItem(item.id)}
-                className="text-gray-400 hover:text-red-600"
-              >
-                <X className="h-4 w-4" />
-              </button>
+            <div className="flex items-start pb-4">
+              <div className="flex items-start gap-2">
+                <h3 className="font-medium text-gray-900 line-clamp-2">{item.name}</h3>
+                {/* Delete Item Icon */}
+                <button
+                  type="button"
+                  onClick={() => handleDeleteItem(item.id)}
+                  className="text-gray-400 hover:text-red-600 flex-shrink-0 mt-1"
+                >
+                  <X className="h-4 w-4" />
+                </button>
+              </div>
             </div>
 
             <div className="flex items-center gap-2 mt-2 h-16">
               {/* Price Input */}
-              <div className="flex flex-col w-[8rem] lg:w-[5rem] text-gray-900 ">
+              <div className="flex flex-col w-[10rem] lg:w-[8rem] text-gray-900">
                 <label
                   htmlFor={`items.${index}.price`}
                   className="block text-sm font-medium text-gray-700 mb-1"
@@ -106,10 +172,20 @@ const PurchaseDetailsSection = () => {
                       {...field}
                       type="number"
                       step="0.01"
-                      className="w-full px-2 py-1 border rounded text-sm"
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value))
-                      }
+                      min="0.01"
+                      className="w-full px-3 py-1.5 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                      onChange={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (!isNaN(value) && value >= 0.01) {
+                          field.onChange(value);
+                        }
+                      }}
+                      onBlur={(e) => {
+                        const value = parseFloat(e.target.value);
+                        if (!isNaN(value) && value >= 0.01) {
+                          field.onChange(Number(value.toFixed(2)));
+                        }
+                      }}
                     />
                   )}
                 />
@@ -125,7 +201,7 @@ const PurchaseDetailsSection = () => {
               <span className="text-gray-500 pb-6">X</span>
 
               {/* Quantity Input */}
-              <div className="flex flex-col w-[6.5rem] lg:w-[4.25rem] text-gray-900">
+              <div className="flex flex-col w-[8rem] lg:w-[6rem] text-gray-900">
                 <label
                   htmlFor={`items.${index}.quantity`}
                   className="block text-sm font-medium text-gray-700 mb-1"
@@ -141,8 +217,13 @@ const PurchaseDetailsSection = () => {
                       type="number"
                       min="1"
                       step="1"
-                      className="w-full px-2 py-1 border focus:border-gray-900 focus:ring-gray-900 rounded text-sm"
-                      onChange={(e) => field.onChange(parseInt(e.target.value))}
+                      className="w-full px-3 py-1.5 border focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900 rounded text-sm"
+                      onChange={(e) => {
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 1) {
+                          field.onChange(value);
+                        }
+                      }}
                     />
                   )}
                 />
@@ -158,7 +239,7 @@ const PurchaseDetailsSection = () => {
               <span className="text-gray-500 pb-6">=</span>
 
               {/* Total Price */}
-              <span className="font-medium text-gray-900 pb-6 w-16 lg:w-10">
+              <span className="font-medium text-gray-900 pb-6 w-24 lg:w-20">
                 {(item.price * item.quantity).toLocaleString(undefined, {
                   minimumFractionDigits: 2,
                   maximumFractionDigits: 2,
@@ -175,9 +256,39 @@ const PurchaseDetailsSection = () => {
           <span>Subtotal</span>
           <span>{subtotal.toFixed(2)}</span>
         </div>
-        <div className="flex justify-between text-sm">
+        <div className="flex justify-between text-sm items-center">
           <span>Shipping</span>
-          <span>{shippingCost.toFixed(2)}</span>
+          <div className="flex items-center gap-2">
+            {isEditingShipping ? (
+              <div className="flex items-center gap-1">
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={shippingCost}
+                  onChange={(e) => handleShippingCostChange(e.target.value)}
+                  className="w-24 px-2 py-1 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
+                  autoFocus
+                />
+                <button
+                  onClick={() => setIsEditingShipping(false)}
+                  className="text-emerald-600 hover:text-emerald-700 p-1"
+                >
+                  <Check className="h-4 w-4" />
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setIsEditingShipping(true)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <Pencil className="h-3 w-3" />
+                </button>
+                <span>{shippingCost.toFixed(2)}</span>
+              </div>
+            )}
+          </div>
         </div>
         <div className="border-t pt-3 flex justify-between font-semibold">
           <span>Total</span>

@@ -14,6 +14,7 @@ import PurchaseDetailsSection from "./purchaseDetailsSection";
 const CreatePurchases = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
 
   const isSidebarCollapsed = useAppSelector(
     (state) => state?.global.isSidebarCollapsed
@@ -29,10 +30,41 @@ const CreatePurchases = () => {
     "Powerbanks",
   ];
 
+  const handleProductSelect = (productId: string, selected: boolean) => {
+    setSelectedProducts(prev => {
+      const newSet = new Set(prev);
+      if (selected) {
+        newSet.add(productId);
+      } else {
+        newSet.delete(productId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleClose = (productId?: string) => {
+    setSelectedProducts(prev => {
+      const newSet = new Set(prev);
+      if (productId) {
+        // Remove specific product
+        newSet.delete(productId);
+      } else {
+        // Clear all selections
+        newSet.clear();
+      }
+      return newSet;
+    });
+  };
+
   // Filter Products based on stock quantity
   const filteredProducts = products?.filter((product) => {
     return product.stockQuantity > 0;
   });
+
+  // Get selected products data
+  const selectedProductsData = filteredProducts?.filter(product => 
+    selectedProducts.has(product.productId)
+  ) || [];
 
   if (isError && !isLoading) {
     return (
@@ -81,6 +113,8 @@ const CreatePurchases = () => {
                   key={product.productId}
                   product={product}
                   miniCard
+                  isSelected={selectedProducts.has(product.productId)}
+                  onSelect={handleProductSelect}
                 />
               ))}
 
@@ -92,7 +126,10 @@ const CreatePurchases = () => {
         </div>
 
         {/* Purchase ID Section */}
-        <PurchaseDetailsSection />
+        <PurchaseDetailsSection 
+          selectedProducts={selectedProductsData} 
+          onClose={handleClose}
+        />
       </div>
     </div>
   );
