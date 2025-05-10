@@ -126,7 +126,7 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
   };
 
   return (
-    <div className="w-full lg:w-[260px] xl:w-[280px] flex-none h-svh overflow-y-auto bg-white text-black p-4 shadow-sm md:border-l border-gray-200 sticky top-0">
+    <div className="w-full lg:w-[260px] xl:w-[280px] flex-none h-svh overflow-y-auto overflow-x-hidden bg-white text-black p-4 shadow-sm sticky top-0">
       {/* Header with Close Icon */}
       <div className="flex justify-between items-center mb-6">
         <h2 className="font-semibold text-lg text-gray-900">Your Cart</h2>
@@ -156,9 +156,9 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
               </div>
             </div>
 
-            <div className="flex items-center gap-2 mt-2 h-16">
+            <div className="flex items-center gap-2 mt-2 h-16 min-w-0">
               {/* Price Input */}
-              <div className="flex flex-col w-[10rem] lg:w-[8.5rem] text-gray-900">
+              <div className="flex flex-col w-20 lg:w-[5.85rem] text-gray-900 flex-shrink-0">
                 <label
                   htmlFor={`items.${index}.price`}
                   className="block text-sm font-medium text-gray-700 mb-1"
@@ -202,7 +202,7 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
               <span className="text-gray-500 pb-6">x</span>
 
               {/* Quantity Input */}
-              <div className="flex flex-col w-[8rem] lg:w-[7rem] text-gray-900">
+              <div className="flex flex-col w-16 lg:w-[4.75rem] text-gray-900 flex-shrink-0">
                 <label
                   htmlFor={`items.${index}.quantity`}
                   className="block text-sm font-medium text-gray-700 mb-1"
@@ -240,8 +240,8 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
               <span className="text-gray-500 pb-6">=</span>
 
               {/* Total Price */}
-              <div className="font-medium text-gray-900 pb-6 w-[90px]">
-                <span className="block text-right break-all whitespace-pre-wrap">
+              <div className="font-medium text-gray-900 pb-6 flex items-center ml-2 min-w-[48px] max-w-[70px] flex-shrink-0">
+                <span className="break-all whitespace-pre-wrap">
                   {(item.price * item.quantity).toLocaleString('en-US', {
                     minimumFractionDigits: Number.isInteger(item.price) ? 0 : 2,
                     maximumFractionDigits: Number.isInteger(item.price) ? 0 : 2

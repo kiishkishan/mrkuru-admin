@@ -10,17 +10,37 @@ import ProductCard from "@/app/(components)/ProductCard";
 import { useAppSelector } from "@/app/redux";
 import { Replace } from "lucide-react";
 import PurchaseDetailsSection from "./purchaseDetailsSection";
+import { SupplierSelect, type Supplier } from "@/app/(components)/Select/SupplierSelect";
 
 const CreatePurchases = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [supplierError, setSupplierError] = useState<string>("");
 
   const isSidebarCollapsed = useAppSelector(
     (state) => state?.global.isSidebarCollapsed
   );
 
   const { products, isLoading, isError } = useGetProducts(searchTerm);
+
+  // Mock suppliers data - replace with actual API call
+  const suppliers: Supplier[] = [
+    { id: "1", name: "Tech Supplies Inc.", email: "contact@techsupplies.com", phone: "+1234567890" },
+    { id: "2", name: "Global Electronics", email: "sales@globalelectronics.com", phone: "+1987654321" },
+    { id: "3", name: "Digital Solutions", email: "info@digitalsolutions.com", phone: "+1122334455" },
+  ];
+
+  const handleCreateNewSupplier = () => {
+    // Implement new supplier creation logic
+    console.log("Create new supplier clicked");
+  };
+
+  const handleSupplierSelect = (supplier: Supplier | null) => {
+    setSelectedSupplier(supplier);
+    setSupplierError("");
+  };
 
   const statusFilterItems = [
     "All",
@@ -125,11 +145,25 @@ const CreatePurchases = () => {
           )}
         </div>
 
-        {/* Purchase ID Section */}
-        <PurchaseDetailsSection 
-          selectedProducts={selectedProductsData} 
-          onClose={handleClose}
-        />
+        {/* Purchase Details Section */}
+        <div className="w-full lg:w-[280px] xl:w-[300px] flex-none h-svh overflow-y-auto bg-white text-black shadow-sm sticky top-0">
+          <div className="p-4 border-b border-gray-200">
+            <SupplierSelect
+              suppliers={suppliers}
+              selectedSupplier={selectedSupplier}
+              onSelect={handleSupplierSelect}
+              error={supplierError}
+              onCreateNew={handleCreateNewSupplier}
+            />
+          </div>
+
+          <div className="p-4">
+            <PurchaseDetailsSection 
+              selectedProducts={selectedProductsData} 
+              onClose={handleClose}
+            />
+          </div>
+        </div>
       </div>
     </div>
   );
