@@ -120,7 +120,7 @@ const CreatePurchases = () => {
         <div
           className={`grid grid-cols-1 sm:grid-cols-2 ${
             isSidebarCollapsed
-              ? "lg:grid-cols-2 xl:grid-cols-4"
+              ? "lg:grid-cols-2 xl:grid-cols-4 sidebar-collapsed-1280"
               : "lg:grid-cols-2 xl:grid-cols-3"
           } 2xl:grid-cols-6 gap-6 justify-center h-svh overflow-y-auto p-8 flex-grow`}
         >
@@ -146,7 +146,7 @@ const CreatePurchases = () => {
         </div>
 
         {/* Purchase Details Section */}
-        <div className="w-full lg:w-[280px] xl:w-[300px] flex-none h-svh overflow-y-auto bg-white text-black shadow-sm sticky top-0">
+        <div className="w-full lg:w-[280px] xl:w-[300px] flex-none h-svh overflow-y-auto bg-white text-black shadow-sm md:border-l border-gray-200 sticky top-0">
           <div className="p-4 border-b border-gray-200">
             <SupplierSelect
               suppliers={suppliers}

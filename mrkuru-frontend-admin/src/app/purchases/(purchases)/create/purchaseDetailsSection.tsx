@@ -4,6 +4,8 @@ import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { X, Pencil, Check } from "lucide-react";
+import { useAppDispatch } from "@/app/redux";
+import { showToast } from "@/state/thunks/alertThunk";
 
 type Product = {
   productId: string;
@@ -41,6 +43,7 @@ interface PurchaseDetailsSectionProps {
 }
 
 const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSectionProps) => {
+  const dispatch = useAppDispatch();
   const [isEditingShipping, setIsEditingShipping] = useState(false);
   const [shippingCost, setShippingCost] = useState(500.00);
 
@@ -121,6 +124,10 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
   };
 
   const onSubmit = (data: any) => {
+    if (selectedProducts.length === 0) {
+      dispatch(showToast("Please select at least one product", "error"));
+      return;
+    }
     console.log("Form submitted:", data);
     alert("Form submitted successfully!");
   };

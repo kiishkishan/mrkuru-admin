@@ -166,12 +166,12 @@ const ProductCard = ({
         </div>
 
         <h3
-          className={`text-xl text-gray-900 font-bold mb-1 text-center ${
-            miniCard ? "break-words h-24 mt-3 px-1" : ""
-          }`}
+          className={`block w-full text-xl text-gray-900 font-bold mb-1 text-center break-words hyphens-none mt-3 px-1 overflow-hidden
+            ${miniCard ? "h-24 line-clamp-none" : ""}
+          `}
         >
-          {miniCard && product.name.length > 50
-            ? `${product.name.substring(0, 50)}...`
+          {miniCard
+            ? product.name.replace(/-($| )/g, " ")
             : product.name}
         </h3>
 

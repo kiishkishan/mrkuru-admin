@@ -2,11 +2,16 @@
 @tailwind components;
 @tailwind utilities;
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
 }
 
-html,body,#root,.app {
+html,
+body,
+#root,
+.app {
   height: 100%;
   width: 100%;
   @apply text-sm;
@@ -21,11 +26,14 @@ select {
 }
 
 @supports (-webkit-touch-callout: none) {
-  input, textarea, select {
+
+  input,
+  textarea,
+  select {
     font-size: 16px !important;
   }
 }
-  
+
 /* Custom Grid Rows Start - Customized Tailwind Class in Dashboard for designated Viewport */
 @media (min-width: 768px) {
   .custom-grid-rows {
@@ -36,5 +44,11 @@ select {
 @media (min-width: 1280px) {
   .custom-grid-rows {
     grid-template-rows: repeat(8, 7.5vh);
+  }
+}
+
+@media (min-width: 1279px) and (max-width: 1350px) {
+  .sidebar-collapsed-1280 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
   }
 }
