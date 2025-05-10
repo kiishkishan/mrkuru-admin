@@ -24,7 +24,8 @@ const priceSchema = z.object({
         .number({
           invalid_type_error: "Price must be a number",
         })
-        .min(0.01, "Minimum price is $0.01"),
+        .int("Price must be a whole number")
+        .min(1, "Minimum price is 1"),
       quantity: z
         .number({
           invalid_type_error: "Qty must be a number",
@@ -157,7 +158,7 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
 
             <div className="flex items-center gap-2 mt-2 h-16">
               {/* Price Input */}
-              <div className="flex flex-col w-[10rem] lg:w-[8rem] text-gray-900">
+              <div className="flex flex-col w-[10rem] lg:w-[8.5rem] text-gray-900">
                 <label
                   htmlFor={`items.${index}.price`}
                   className="block text-sm font-medium text-gray-700 mb-1"
@@ -171,19 +172,19 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
                     <input
                       {...field}
                       type="number"
-                      step="0.01"
-                      min="0.01"
+                      step="1"
+                      min="1"
                       className="w-full px-3 py-1.5 border rounded text-sm focus:outline-none focus:ring-1 focus:ring-gray-900 focus:border-gray-900"
                       onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value) && value >= 0.01) {
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 1) {
                           field.onChange(value);
                         }
                       }}
                       onBlur={(e) => {
-                        const value = parseFloat(e.target.value);
-                        if (!isNaN(value) && value >= 0.01) {
-                          field.onChange(Number(value.toFixed(2)));
+                        const value = parseInt(e.target.value);
+                        if (!isNaN(value) && value >= 1) {
+                          field.onChange(value);
                         }
                       }}
                     />
@@ -198,10 +199,10 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
                 </div>
               </div>
 
-              <span className="text-gray-500 pb-6">X</span>
+              <span className="text-gray-500 pb-6">x</span>
 
               {/* Quantity Input */}
-              <div className="flex flex-col w-[8rem] lg:w-[6rem] text-gray-900">
+              <div className="flex flex-col w-[8rem] lg:w-[7rem] text-gray-900">
                 <label
                   htmlFor={`items.${index}.quantity`}
                   className="block text-sm font-medium text-gray-700 mb-1"
@@ -239,12 +240,14 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
               <span className="text-gray-500 pb-6">=</span>
 
               {/* Total Price */}
-              <span className="font-medium text-gray-900 pb-6 w-24 lg:w-20">
-                {(item.price * item.quantity).toLocaleString(undefined, {
-                  minimumFractionDigits: 2,
-                  maximumFractionDigits: 2,
-                })}
-              </span>
+              <div className="font-medium text-gray-900 pb-6 w-[90px]">
+                <span className="block text-right break-all whitespace-pre-wrap">
+                  {(item.price * item.quantity).toLocaleString('en-US', {
+                    minimumFractionDigits: Number.isInteger(item.price) ? 0 : 2,
+                    maximumFractionDigits: Number.isInteger(item.price) ? 0 : 2
+                  })}
+                </span>
+              </div>
             </div>
           </div>
         ))}
@@ -254,7 +257,14 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
       <div className="space-y-3 mb-6 text-gray-900 bg-gray-100 p-6 rounded-lg">
         <div className="flex justify-between text-sm">
           <span>Subtotal</span>
-          <span>{subtotal.toFixed(2)}</span>
+          <div className="w-[90px]">
+            <span className="block text-right break-all whitespace-pre-wrap">
+              {subtotal.toLocaleString('en-US', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+              })}
+            </span>
+          </div>
         </div>
         <div className="flex justify-between text-sm items-center">
           <span>Shipping</span>
@@ -285,14 +295,22 @@ const PurchaseDetailsSection = ({ selectedProducts, onClose }: PurchaseDetailsSe
                 >
                   <Pencil className="h-3 w-3" />
                 </button>
-                <span>{shippingCost.toFixed(2)}</span>
+                <span>{shippingCost.toLocaleString('en-US', {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2
+                })}</span>
               </div>
             )}
           </div>
         </div>
         <div className="border-t pt-3 flex justify-between font-semibold">
           <span>Total</span>
-          <span>{total.toFixed(2)} LKR</span>
+          <span className="text-right break-words max-w-[120px] whitespace-pre-wrap">
+            {total.toLocaleString('en-US', {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2
+            })} LKR
+          </span>
         </div>
       </div>
 
