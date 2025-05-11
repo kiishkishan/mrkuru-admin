@@ -10,31 +10,68 @@ import ProductCard from "@/app/(components)/ProductCard";
 import { useAppSelector } from "@/app/redux";
 import { Replace } from "lucide-react";
 import PurchaseDetailsSection from "./purchaseDetailsSection";
-import { SupplierSelect, type Supplier } from "@/app/(components)/Select/SupplierSelect";
+import {
+  SupplierSelect,
+  type Supplier,
+} from "@/app/(components)/Select/SupplierSelect";
+import { useGetSuppliersQuery, useCreateSupplierMutation } from "@/state/api";
+import CreateSupplierForm from "@/app/purchases/(suppliers)/createSupplierForm";
+import { showToast } from "@/state/thunks/alertThunk";
+import { useAppDispatch } from "@/app/redux";
+import LargeModal from "@/app/(components)/Modal/LargeModal";
 
 const CreatePurchases = () => {
   const [statusFilter, setStatusFilter] = useState("All");
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(new Set());
-  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(null);
+  const [selectedProducts, setSelectedProducts] = useState<Set<string>>(
+    new Set()
+  );
+  const [selectedSupplier, setSelectedSupplier] = useState<Supplier | null>(
+    null
+  );
   const [supplierError, setSupplierError] = useState<string>("");
+  const [supplierSearchTerm, setSupplierSearchTerm] = useState<string>("");
+  const [isCreateAreaOpen, setIsCreateAreaOpen] = useState(false);
 
+  const dispatch = useAppDispatch();
   const isSidebarCollapsed = useAppSelector(
     (state) => state?.global.isSidebarCollapsed
   );
 
   const { products, isLoading, isError } = useGetProducts(searchTerm);
+  const {
+    data: suppliersData,
+    isLoading: isSuppliersLoading,
+    refetch: refetchSuppliers,
+  } = useGetSuppliersQuery(supplierSearchTerm);
+  const [createSupplier] = useCreateSupplierMutation();
 
-  // Mock suppliers data - replace with actual API call
-  const suppliers: Supplier[] = [
-    { id: "1", name: "Tech Supplies Inc.", email: "contact@techsupplies.com", phone: "+1234567890" },
-    { id: "2", name: "Global Electronics", email: "sales@globalelectronics.com", phone: "+1987654321" },
-    { id: "3", name: "Digital Solutions", email: "info@digitalsolutions.com", phone: "+1122334455" },
-  ];
+  // Transform suppliers data to match Supplier type
+  const suppliers: Supplier[] =
+    suppliersData?.map((supplier) => ({
+      id: supplier.supplierId,
+      name: supplier.supplierName,
+      email: supplier.supplierContact,
+      phone: supplier.supplierContact,
+      address: supplier.supplierAddress,
+    })) || [];
 
   const handleCreateNewSupplier = () => {
-    // Implement new supplier creation logic
-    console.log("Create new supplier clicked");
+    setIsCreateAreaOpen(true);
+  };
+
+  const handleCreateSupplier = async (supplierData: any) => {
+    try {
+      await createSupplier(supplierData).unwrap();
+      dispatch(showToast("Supplier created successfully!", "success"));
+      setIsCreateAreaOpen(false);
+      refetchSuppliers();
+    } catch (error: any) {
+      console.error("Failed to create supplier:", error);
+      dispatch(
+        showToast("Failed to create supplier. Please try again.", "error")
+      );
+    }
   };
 
   const handleSupplierSelect = (supplier: Supplier | null) => {
@@ -51,7 +88,7 @@ const CreatePurchases = () => {
   ];
 
   const handleProductSelect = (productId: string, selected: boolean) => {
-    setSelectedProducts(prev => {
+    setSelectedProducts((prev) => {
       const newSet = new Set(prev);
       if (selected) {
         newSet.add(productId);
@@ -63,7 +100,7 @@ const CreatePurchases = () => {
   };
 
   const handleClose = (productId?: string) => {
-    setSelectedProducts(prev => {
+    setSelectedProducts((prev) => {
       const newSet = new Set(prev);
       if (productId) {
         // Remove specific product
@@ -82,9 +119,10 @@ const CreatePurchases = () => {
   });
 
   // Get selected products data
-  const selectedProductsData = filteredProducts?.filter(product => 
-    selectedProducts.has(product.productId)
-  ) || [];
+  const selectedProductsData =
+    filteredProducts?.filter((product) =>
+      selectedProducts.has(product.productId)
+    ) || [];
 
   if (isError && !isLoading) {
     return (
@@ -98,7 +136,15 @@ const CreatePurchases = () => {
     <div className="w-full min-h-screen bg-white text-white flex flex-col">
       {/* Title */}
       <Header name="Create Purchase" className="w-full text-center pt-6" />
-
+      {isCreateAreaOpen && (
+        <LargeModal
+          isOpen={isCreateAreaOpen}
+          onClose={() => setIsCreateAreaOpen(false)}
+          title="Create New Supplier"
+        >
+          <CreateSupplierForm onCreate={handleCreateSupplier} inModal={true} />
+        </LargeModal>
+      )}
       {/* Filters */}
       <div className="flex justify-start px-4 py-2 gap-4 bg-white shadow-md">
         <StatusFilter
@@ -154,12 +200,14 @@ const CreatePurchases = () => {
               onSelect={handleSupplierSelect}
               error={supplierError}
               onCreateNew={handleCreateNewSupplier}
+              onSearch={setSupplierSearchTerm}
+              isLoading={isSuppliersLoading}
             />
           </div>
 
           <div className="p-4">
-            <PurchaseDetailsSection 
-              selectedProducts={selectedProductsData} 
+            <PurchaseDetailsSection
+              selectedProducts={selectedProductsData}
               onClose={handleClose}
             />
           </div>

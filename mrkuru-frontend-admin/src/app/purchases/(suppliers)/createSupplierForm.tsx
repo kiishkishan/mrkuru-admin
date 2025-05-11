@@ -30,9 +30,13 @@ type PurchaseStatusForm = yup.InferType<typeof schema> & {
 
 type CreateSupplierFormProps = {
   onCreate: (formData: PurchaseStatusForm) => void;
+  inModal?: boolean;
 };
 
-const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
+const CreateSupplierForm = ({
+  onCreate,
+  inModal = false,
+}: CreateSupplierFormProps) => {
   const {
     control,
     handleSubmit,
@@ -53,16 +57,27 @@ const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
   };
 
   return (
-    <div className="w-full lg:w-3/5 xl:w-4/7 mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200">
+    <div
+      className={
+        inModal
+          ? "w-full p-0 bg-transparent mb-0"
+          : "w-full lg:w-3/5 xl:w-4/7 mb-8 p-4 border rounded-lg shadow-md bg-white transition-all ease-in-out duration-200"
+      }
+    >
       {/* Simple Subheading */}
-      <h2 className="text-lg font-semibold mb-3 text-gray-900">
-        Add a New Purchase Status
-      </h2>
+      {!inModal && (
+        <h2 className="text-lg font-semibold mb-3 text-gray-900">
+          Add a New Supplier
+        </h2>
+      )}
 
       {/* Form */}
       <form
         onSubmit={handleSubmit(onSubmit)}
-        className="grid grid-cols-1 gap-6 sm:grid-cols-2"
+        className={`grid grid-cols-1 ${
+          inModal ? "gap-y-8 gap-x-8" : "gap-6"
+        } sm:grid-cols-2 w-full`}
+        style={inModal ? { maxWidth: "100%" } : {}}
       >
         {/* Supplier Name */}
         <div>
@@ -101,7 +116,9 @@ const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
 
         {/* Supplier Contact */}
         <div>
-          <label className="block text-sm font-medium">Supplier Contact</label>
+          <label className="block text-sm font-medium text-gray-700">
+            Supplier Contact
+          </label>
           <div className="relative">
             <Controller
               name="supplierContact"
@@ -154,7 +171,7 @@ const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
               <div className="relative">
                 <textarea
                   {...field}
-                  className="block w-full p-2 border-gray-300 border rounded-md resize-none h-22 bg-white pr-17"
+                  className="block w-full p-2 border-gray-300 text-gray-900 border rounded-md resize-none h-22 bg-white pr-17"
                   rows={3}
                 />
                 {field.value !== "" && (
@@ -180,9 +197,11 @@ const CreateSupplierForm = ({ onCreate }: CreateSupplierFormProps) => {
         <div className="sm:col-span-2 text-left">
           <button
             type="submit"
-            className="px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm"
+            className={`px-3 py-2 bg-blue-500 text-white rounded hover:bg-blue-700 text-sm ${
+              inModal ? "w-full" : ""
+            }`}
           >
-            Create Product
+            Create Supplier
           </button>
         </div>
       </form>
